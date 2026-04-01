@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🏰 FLAG KINGDOM</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:#1a1a2e;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;padding:8px;min-height:100vh;}
+#app{max-width:640px;margin:0 auto;}
+.ttl{text-align:center;padding:12px 0 8px;}
+.ttl h1{font-size:24px;font-weight:900;color:#f5a623;letter-spacing:2px;}
+.ttl .fl{font-size:18px;margin:4px 0;}
+.ttl .sub{font-size:10px;color:#aaa;}
+.card{background:#16213e;border:1px solid #2a3a5e;border-radius:12px;padding:12px;margin-bottom:8px;}
+.ctitle{font-size:13px;font-weight:700;color:#f5a623;margin-bottom:8px;}
+.fg{margin-bottom:10px;}
+.fg label{display:block;font-size:13px;color:#aaa;margin-bottom:5px;}
+/* iPhone対応: font-size:16px でズーム防止 */
+.fg input,.fg select{
+  display:block;
+  width:100%;
+  font-size:16px;
+  padding:12px;
+  border:2px solid #2a3a5e;
+  border-radius:9px;
+  background:#0f3460;
+  color:#fff;
+  outline:none;
+  /* iOSのデフォルトスタイルを保持（-webkit-appearance:noneは使わない） */
+  -webkit-appearance:menulist-button;
+  appearance:menulist;
+}
+.fg input{
+  -webkit-appearance:none;
+  appearance:none;
+}
+.fg input:focus,.fg select:focus{border-color:#e94560;}
+.fg input::placeholder{color:#6677aa;}
+.fg select option{background:#0f3460;color:#fff;}
+.divtxt{text-align:center;font-size:11px;color:#556;margin:6px 0;}
+.frow{display:flex;gap:8px;align-items:stretch;margin-bottom:0;}
+.frow .fg{flex:1;margin-bottom:0;}
+.errmsg{font-size:12px;color:#e94560;min-height:16px;margin-top:4px;}
+.btn-start{display:block;width:100%;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,#e94560,#f5a623);color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px;}
+.btn-start:disabled{background:#2a2a4a;color:#556;}
+.btn-join{padding:12px 16px;border:none;border-radius:9px;background:#e94560;color:#fff;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.btn-ctrl{font-size:12px;padding:8px 11px;border:1px solid #2a3a5e;border-radius:7px;background:#16213e;color:#ccc;cursor:pointer;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;min-height:22px;margin:6px 0;}
+.chip{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;border:1px solid;font-size:11px;}
+.chip img{width:22px;height:15px;border-radius:2px;object-fit:cover;}
+.sb{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;}
+.scard{border:2px solid #2a3a5e;border-radius:9px;padding:5px 7px;text-align:center;min-width:62px;cursor:pointer;background:#0f1e3d;transition:all 0.2s;}
+.scard.on{border-color:#f5a623;transform:scale(1.06);box-shadow:0 0 8px rgba(245,166,35,0.4);}
+.scard img{width:32px;height:21px;display:block;margin:0 auto 2px;border-radius:2px;object-fit:cover;}
+.ss{font-size:13px;font-weight:700;}.sn{font-size:9px;color:#aaa;}.sk{font-size:8px;color:#777;}
+.tbanner{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;margin-bottom:5px;border:2px solid #333;}
+.tbanner img{width:28px;height:19px;border-radius:2px;object-fit:cover;flex-shrink:0;}
+.tt{font-size:12px;font-weight:600;color:#eee;}
+.tbar{height:4px;background:#1a1a2e;border-radius:2px;margin-bottom:4px;overflow:hidden;}
+.tfill{height:100%;border-radius:2px;background:#44cc44;}
+.tinfo{font-size:10px;text-align:center;color:#aaa;margin-bottom:5px;min-height:13px;}
+.live{font-size:12px;font-weight:700;color:#f5a623;text-align:center;margin-bottom:5px;min-height:16px;}
+.mapwrap{border-radius:11px;padding:3px;border:4px solid #44aa44;background:#1a3a6e;margin-bottom:7px;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;}
+#gc{display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;}
+.legend{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;}
+.lchip{display:flex;align-items:center;gap:3px;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid;}
+.lchip img{width:16px;height:11px;border-radius:2px;object-fit:cover;}
+.crow{display:flex;align-items:center;gap:5px;margin-bottom:5px;}
+.crow img{width:18px;height:12px;border-radius:2px;object-fit:cover;flex-shrink:0;}
+.cname{font-size:10px;color:#eee;width:58px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex-shrink:0;}
+.cbg{flex:1;height:7px;background:#1a1a2e;border-radius:4px;overflow:hidden;}
+.cbar{height:100%;border-radius:4px;transition:width 0.4s;}
+.cpct{font-size:10px;color:#888;width:28px;text-align:right;flex-shrink:0;}
+.cbtn{font-size:11px;padding:4px 9px;border:none;border-radius:5px;background:#e94560;color:#fff;cursor:pointer;font-weight:700;flex-shrink:0;}
+.ctrl{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;}
+.mvpband{background:linear-gradient(135deg,#f5a623,#e94560);border-radius:10px;padding:11px;text-align:center;margin-bottom:10px;}
+.mvpband .ml{font-size:10px;color:rgba(255,255,255,0.8);}.mvpband .mn{font-size:20px;font-weight:900;color:#fff;}.mvpband .ms{font-size:11px;color:rgba(255,255,255,0.85);}
+.rrow{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:8px;margin-bottom:4px;}
+.rrow img{width:30px;height:20px;border-radius:2px;object-fit:cover;}
+.rnum{font-size:15px;font-weight:700;width:24px;}.rname{font-size:12px;flex:1;font-weight:600;}
+.rbg{height:5px;background:rgba(255,255,255,0.1);border-radius:3px;flex:2;}.rbar{height:100%;border-radius:3px;}
+.rscore{font-size:13px;font-weight:700;min-width:42px;text-align:right;}
+.sharerow{display:flex;gap:6px;margin-top:8px;}
+.sharex{flex:1;padding:9px;border:none;border-radius:8px;background:#000;color:#fff;font-size:12px;font-weight:700;cursor:pointer;}
+.sharec{flex:1;padding:9px;border:1px solid #333;border-radius:8px;background:#0f3460;color:#fff;font-size:12px;font-weight:700;cursor:pointer;}
+.ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.82);z-index:7000;align-items:center;justify-content:center;}
+.ov.show{display:flex;}
+.popbox{background:#16213e;border:2px solid #f5a623;border-radius:14px;padding:14px;max-width:300px;width:92%;max-height:85vh;overflow-y:auto;}
+.pophead{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.pophead img{width:42px;height:28px;border-radius:4px;object-fit:cover;}
+.popttl{font-size:15px;font-weight:800;color:#f5a623;}.popcnt{font-size:11px;color:#aaa;}
+.popsc{text-align:center;font-size:12px;color:#aaa;margin-bottom:9px;}
+.popsc span{font-size:22px;font-weight:900;color:#f5a623;}
+.mitem{display:flex;align-items:center;gap:7px;padding:6px 8px;background:rgba(255,255,255,0.05);border-radius:6px;margin-bottom:3px;}
+.mnum{font-size:11px;color:#777;width:16px;}.mname{font-size:13px;font-weight:600;flex:1;}
+.mbadge{font-size:9px;padding:1px 5px;border-radius:4px;background:#e94560;color:#fff;}
+.popjoin{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#e94560,#f5a623);color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin:9px 0 5px;}
+.popclose{width:100%;padding:6px;border:1px solid #333;border-radius:7px;background:transparent;color:#aaa;font-size:11px;cursor:pointer;}
+.entryov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;}
+.entryov.show{display:flex;}
+.entryov img{width:100px;height:67px;border-radius:9px;border:3px solid #f5a623;object-fit:cover;}
+.ename{font-size:24px;font-weight:900;color:#fff;margin-top:10px;text-align:center;}
+.esub{font-size:13px;color:#f5a623;margin-top:4px;text-align:center;}
+.etap{font-size:10px;color:#555;margin-top:12px;}
+</style>
+</head>
+<body>
+
+<div id="entryOv" class="entryov" onclick="this.classList.remove('show')">
+  <img id="entryImg" src="" alt="">
+  <div class="ename" id="entryName"></div>
+  <div class="esub" id="entrySub"></div>
+  <div class="etap">タップで閉じる</div>
+</div>
+
+<div id="popOv" class="ov" onclick="if(event.target===this)closePop()">
+  <div class="popbox">
+    <div class="pophead"><img id="popImg" src="" alt=""><div><div class="popttl" id="popTtl"></div><div class="popcnt" id="popCnt"></div></div></div>
+    <div class="popsc">Cells: / マス数：<span id="popScore">0</span></div>
+    <div id="popMembers"></div>
+    <button class="popjoin" onclick="joinFromPop()">🔥 Join this team! / このチームに参戦！</button>
+    <button class="popclose" onclick="closePop()">✕ Close / 閉じる</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="ttl">
+    <div style="font-size:22px;">👑</div>
+    <h1>🏰 FLAG KINGDOM 🌍</h1>
+    <div class="fl">🇯🇵🇺🇸🇫🇷🇧🇷🇩🇪🇰🇷</div>
+    <div class="sub">✨ Conquer the world with your flag! ✨<br><span style="font-size:0.8em;color:#aaa;">世界の国旗で陣地を制覇せよ！</span></div>
+  </div>
+
+  <div id="joinSec" class="card">
+    <div class="ctitle">⚔️ Register to Play (2–8 Countries)<br><span style="font-size:0.75em;color:rgba(245,166,35,0.8);">参加登録（2〜8カ国）</span></div>
+    <div class="fg">
+      <label>① Enter your name / あなたのEnter name / 名前を入力</label>
+      <input type="text" id="nickIn" placeholder="e.g. Yuka, Tom, Sakura / 例：ユウカ、トム" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div class="fg">
+      <label>② Select your country / 国を選択（リストから選ぶ）</label>
+      <select id="ctSelect" size="1">
+        <option value="">▼ Select a country / 国を選んでください</option>
+      </select>
+    </div>
+    <div class="divtxt">── Or type country name directly / または国名を直接入力 ──</div>
+    <div class="frow">
+      <div class="fg">
+        <input type="text" id="ctText" placeholder="Greece, Mali, Japan… / ギリシャ、まり…" maxlength="30" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <button class="btn-join" onclick="doAdd()">Join！🔥<br><span style="font-size:0.7em;">参戦！</span></button>
+    </div>
+    <div class="errmsg" id="errMsg"></div>
+    <div class="chips" id="chips"></div>
+    <button class="btn-start" id="startBtn" onclick="startGame()" disabled>🚀 GAME START！🏰<br><span style="font-size:0.75em;">ゲームスタート！</span></button>
+  </div>
+
+  <div id="gameSec" style="display:none;">
+    <div class="legend" id="legend"></div>
+    <div class="sb" id="sb"></div>
+    <div class="tbanner" id="tbanner"></div>
+    <div class="tbar"><div class="tfill" id="tfill" style="width:100%;"></div></div>
+    <div class="tinfo" id="tinfo"></div>
+    <div class="live" id="live">⚔️ Battle is ready! / 戦場の準備完了！</div>
+    <div class="mapwrap" id="mapwrap"><canvas id="gc"></canvas></div>
+    <div class="card">
+      <div class="ctitle">🎉 Cheer Gauge / 応援ゲージ</div>
+      <div id="cheerEl"></div>
+    </div>
+    <div id="midSec" class="card" style="display:none;">
+      <div class="ctitle">⚔️ Join Mid-Game! (Game continues)<br><span style="font-size:0.75em;color:rgba(245,166,35,0.8);">途中参戦！（ゲームは続きから）</span></div>
+      <div class="fg">
+        <label>Name / 名前</label>
+        <input type="text" id="midNick" placeholder="Enter name / 名前を入力" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="fg">
+        <label>Country / 国を選択</label>
+        <select id="midSel" size="1">
+          <option value="">▼ Select a country / 国を選んでください</option>
+        </select>
+      </div>
+      <div class="errmsg" id="midErr"></div>
+      <button class="btn-join" style="width:100%;padding:12px;font-size:16px;" onclick="doMidJoin()">このチームでJoin！🔥<br><span style="font-size:0.7em;">参戦！</span></button>
+    </div>
+    <div class="ctrl">
+      <button class="btn-ctrl" onclick="toggleMid()">➕ Join<br><span style="font-size:0.7em;">途中参戦</span></button>
+      <button class="btn-ctrl" id="hintBtn" onclick="toggleHint()">💡 Hint<br><span style="font-size:0.7em;">ヒント</span></button>
+      <button class="btn-ctrl" id="sndBtn" onclick="toggleSnd()">🔊 Sound ON<br><span style="font-size:0.7em;">音あり</span></button>
+      <button class="btn-ctrl" style="color:#e94560;" onclick="confirmReset()">🔄 Reset<br><span style="font-size:0.7em;">リセット</span></button>
+    </div>
+  </div>
+
+  <div id="resultSec" style="display:none;">
+    <div class="card" id="resultEl"></div>
+    <div class="ctrl"><button class="btn-ctrl" onclick="doReset()">🔄 Play Again！<br><span style="font-size:0.7em;">もう一度！</span></button></div>
+  </div>
+</div>
+
+<script>
+// 地図データ
+const COLS=44,ROWS=26;
+const MAPD=["00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00111000000111000001111100000000000000000000","01111100011111111111111111000000000000000000","01111111111111111111111111100000000000000000","00111111111111111111111111110000000010000000","00011111111111111111111111110000000011000000","00001111111111011111111111000000000001100000","00000111111100001111111100000000001100001100","00000011111000000111111000000000001111001000","00000011110000000011110000000001001111000000","00000011100000000011111000000000000111000000","00000011100000000011101000000000000111000000","00000011100000000011101000000000000001000000","00000001000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00000000000000000000000000011000000000000000","00000000000000000000000000011100000000000000","00000000000000000000000000001100000000000000","00000000000000000000000000000000000000100000","00000000000000000000000000000000000000100000","00000000000000000000000000000000000000100000","00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000"];
+const ISL=[[8,40],[9,40],[8,41],[7,6],[8,6],[8,7],[3,15],[4,15],[4,16],[3,16],[2,12],[2,13],[6,18],[7,18],[11,22],[12,22],[13,22],[5,36],[6,36],[6,37],[7,37],[7,38],[8,34],[9,34],[10,34],[10,35],[11,35],[11,36],[12,35],[10,31],[20,38],[21,38],[22,38],[7,7],[8,8],[3,14]];
+const GR=[];
+for(let r=0;r<ROWS;r++){GR.push([]);for(let c=0;c<COLS;c++)GR[r].push(parseInt(MAPD[r][c]));}
+ISL.forEach(([r,c])=>{if(r<ROWS&&c<COLS)GR[r][c]=1;});
+const LTOTAL=GR.flat().filter(v=>v===1).length;
+const DIR=[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+
+// 国データ
+const NS=[
+  {c:'jp',n:'日本',k:['日本','にほん','japan','jp']},
+  {c:'us',n:'アメリカ',k:['アメリカ','あめりか','usa','us','america']},
+  {c:'cn',n:'中国',k:['中国','ちゅうごく','china','cn']},
+  {c:'ru',n:'ロシア',k:['ロシア','ろしあ','russia','ru']},
+  {c:'gb',n:'イギリス',k:['イギリス','いぎりす','uk','gb','england']},
+  {c:'fr',n:'フランス',k:['フランス','ふらんす','france','fr']},
+  {c:'de',n:'ドイツ',k:['ドイツ','どいつ','germany','de']},
+  {c:'it',n:'イタリア',k:['イタリア','いたりあ','italy','it']},
+  {c:'es',n:'スペイン',k:['スペイン','すぺいん','spain','es']},
+  {c:'kr',n:'韓国',k:['韓国','かんこく','korea','kr']},
+  {c:'in',n:'インド',k:['インド','いんど','india','in']},
+  {c:'br',n:'ブラジル',k:['ブラジル','ぶらじる','brazil','br']},
+  {c:'ca',n:'カナダ',k:['カナダ','かなだ','canada','ca']},
+  {c:'au',n:'オーストラリア',k:['オーストラリア','おーすとらりあ','australia','au']},
+  {c:'mx',n:'メキシコ',k:['メキシコ','めきしこ','mexico','mx']},
+  {c:'ar',n:'アルゼンチン',k:['アルゼンチン','あるぜんちん','argentina','ar']},
+  {c:'tr',n:'トルコ',k:['トルコ','とるこ','turkey','tr']},
+  {c:'th',n:'タイ',k:['タイ','たい','thailand','th']},
+  {c:'id',n:'インドネシア',k:['インドネシア','いんどねしあ','indonesia','id']},
+  {c:'vn',n:'ベトナム',k:['ベトナム','べとなむ','vietnam','vn']},
+  {c:'ph',n:'フィリピン',k:['フィリピン','ふぃりぴん','philippines','ph']},
+  {c:'my',n:'マレーシア',k:['マレーシア','まれーしあ','malaysia','my']},
+  {c:'sg',n:'シンガポール',k:['シンガポール','しんがぽーる','singapore','sg']},
+  {c:'tw',n:'台湾',k:['台湾','たいわん','taiwan','tw']},
+  {c:'nl',n:'オランダ',k:['オランダ','おらんだ','netherlands','nl']},
+  {c:'be',n:'ベルギー',k:['ベルギー','べるぎー','belgium','be']},
+  {c:'ch',n:'スイス',k:['スイス','すいす','switzerland','ch']},
+  {c:'at',n:'オーストリア',k:['オーストリア','おーすとりあ','austria','at']},
+  {c:'se',n:'スウェーデン',k:['スウェーデン','すうぇーでん','sweden','se']},
+  {c:'no',n:'ノルウェー',k:['ノルウェー','のるうぇー','norway','no']},
+  {c:'dk',n:'デンマーク',k:['デンマーク','でんまーく','denmark','dk']},
+  {c:'fi',n:'フィンランド',k:['フィンランド','ふぃんらんど','finland','fi']},
+  {c:'pl',n:'ポーランド',k:['ポーランド','ぽーらんど','poland','pl']},
+  {c:'ua',n:'ウクライナ',k:['ウクライナ','うくらいな','ukraine','ua']},
+  {c:'gr',n:'ギリシャ',k:['ギリシャ','ぎりしゃ','greece','gr']},
+  {c:'pt',n:'ポルトガル',k:['ポルトガル','ぽるとがる','portugal','pt']},
+  {c:'hu',n:'ハンガリー',k:['ハンガリー','はんがりー','hungary','hu']},
+  {c:'cz',n:'チェコ',k:['チェコ','ちぇこ','czech','cz']},
+  {c:'ro',n:'ルーマニア',k:['ルーマニア','るーまにあ','romania','ro']},
+  {c:'ie',n:'アイルランド',k:['アイルランド','あいるらんど','ireland','ie']},
+  {c:'za',n:'南アフリカ',k:['南アフリカ','みなみあふりか','southafrica','za']},
+  {c:'eg',n:'エジプト',k:['エジプト','えじぷと','egypt','eg']},
+  {c:'ng',n:'ナイジェリア',k:['ナイジェリア','ないじぇりあ','nigeria','ng']},
+  {c:'ke',n:'ケニア',k:['ケニア','けにあ','kenya','ke']},
+  {c:'et',n:'エチオピア',k:['エチオピア','えちおぴあ','ethiopia','et']},
+  {c:'gh',n:'ガーナ',k:['ガーナ','がーな','ghana','gh']},
+  {c:'ml',n:'マリ',k:['マリ','まり','mali','mari','ml']},
+  {c:'ma',n:'モロッコ',k:['モロッコ','もろっこ','morocco','ma']},
+  {c:'sa',n:'サウジアラビア',k:['サウジアラビア','さうじあらびあ','saudiarabia','sa']},
+  {c:'ae',n:'UAE',k:['UAE','うえー','uae','ae','アラブ','あらぶ']},
+  {c:'ir',n:'イラン',k:['イラン','いらん','iran','ir']},
+  {c:'pk',n:'パキスタン',k:['パキスタン','ぱきすたん','pakistan','pk']},
+  {c:'bd',n:'バングラデシュ',k:['バングラデシュ','ばんぐらでしゅ','bangladesh','bd']},
+  {c:'cl',n:'チリ',k:['チリ','ちり','chile','cl']},
+  {c:'co',n:'コロンビア',k:['コロンビア','ころんびあ','colombia','co']},
+  {c:'pe',n:'ペルー',k:['ペルー','ぺるー','peru','pe']},
+  {c:'ve',n:'ベネズエラ',k:['ベネズエラ','べねずえら','venezuela','ve']},
+  {c:'nz',n:'ニュージーランド',k:['ニュージーランド','にゅーじーらんど','newzealand','nz']},
+  {c:'kp',n:'北朝鮮',k:['北朝鮮','きたちょうせん','northkorea','kp']},
+  {c:'mm',n:'ミャンマー',k:['ミャンマー','みゃんまー','myanmar','mm']},
+  {c:'kh',n:'カンボジア',k:['カンボジア','かんぼじあ','cambodia','kh']},
+  {c:'qa',n:'カタール',k:['カタール','かたーる','qatar','qa']},
+  {c:'cu',n:'キューバ',k:['キューバ','きゅーば','cuba','cu']},
+  {c:'mn',n:'モンゴル',k:['モンゴル','もんごる','mongolia','mn']},
+  {c:'iq',n:'イラク',k:['イラク','いらく','iraq','iq']},
+  {c:'la',n:'ラオス',k:['ラオス','らおす','laos','la']},
+  {c:'lk',n:'スリランカ',k:['スリランカ','すりらんか','srilanka','lk']},
+  {c:'np',n:'ネパール',k:['ネパール','ねぱーる','nepal','np']},
+  {c:'tz',n:'タンザニア',k:['タンザニア','たんざにあ','tanzania','tz']},
+  {c:'il',n:'イスラエル',k:['イスラエル','いすらえる','israel','il']},
+  {c:'hk',n:'香港',k:['香港','ほんこん','hongkong','hk']},
+];
+
+const PAL=[
+  {bg:'#ff4444',bo:'#ff8888',fi:'#cc2222'},
+  {bg:'#4488ff',bo:'#88bbff',fi:'#2255cc'},
+  {bg:'#44cc44',bo:'#88ee88',fi:'#229922'},
+  {bg:'#ffaa00',bo:'#ffcc55',fi:'#cc8800'},
+  {bg:'#aa44ff',bo:'#cc88ff',fi:'#7722cc'},
+  {bg:'#00ccaa',bo:'#55eedd',fi:'#009977'},
+  {bg:'#ff6600',bo:'#ff9944',fi:'#cc4400'},
+  {bg:'#ff44aa',bo:'#ff88cc',fi:'#cc2277'},
+];
+
+function fUrl(c){return`https://flagcdn.com/w40/${c}.png`;}
+
+// ひらがな→カタカナ
+function h2k(s){return s.replace(/[\u3041-\u3096]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));}
+
+// 国検索
+function findN(q){
+  q=q.trim().replace(/\s/g,'');
+  if(!q)return null;
+  const ql=q.toLowerCase();
+  const qk=h2k(q).toLowerCase();
+  return NS.find(x=>x.k.some(k=>{
+    const kl=k.toLowerCase();
+    return kl===ql||kl===qk||h2k(k).toLowerCase()===ql;
+  }))||null;
+}
+function findC(c){return NS.find(x=>x.c===c)||null;}
+
+// selectを構築（DOMContentLoaded後に実行保証）
+function buildSelects(){
+  const sorted=[...NS].sort((a,b)=>a.n.localeCompare(b.n,'ja'));
+  ['ctSelect','midSel'].forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel)return;
+    // 既存のoption（最初の1つ）を保持して追加
+    while(sel.options.length>1)sel.remove(1);
+    sorted.forEach(x=>{
+      const o=new Option(x.n,x.c);
+      sel.add(o);
+    });
+  });
+}
+
+// DOMが確実に準備できてから実行
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',buildSelects);
+} else {
+  buildSelects();
+}
+
+// 画像キャッシュ
+const IP={},IR={};
+function loadImg(c){
+  if(!IP[c]){
+    IP[c]=new Promise(res=>{
+      const i=new Image();
+      i.crossOrigin='anonymous';
+      i.onload=()=>{IR[c]=i;res(i);};
+      i.onerror=()=>res(null);
+      i.src=fUrl(c);
+      setTimeout(()=>res(null),6000);
+    });
+  }
+  return IP[c];
+}
+function gImg(c){return IR[c]||null;}
+async function preloadAll(codes){await Promise.all(codes.map(async c=>{const i=await loadImg(c);if(i)IR[c]=i;}));}
+function fTag(c,w,h){
+  const i=gImg(c);
+  return`<img src="${i?i.src:fUrl(c)}" width="${w}" height="${h}" style="border-radius:2px;object-fit:cover;border:1px solid rgba(255,255,255,0.18);" crossorigin="anonymous">`;
+}
+
+// 参加者
+let players=[];
+function doAdd(){
+  const nick=document.getElementById('nickIn').value.trim();
+  const sel=document.getElementById('ctSelect');
+  const selCode=sel.value;
+  const txt=document.getElementById('ctText').value.trim();
+  const err=document.getElementById('errMsg');
+  if(!nick){err.textContent='① Enter name / 名前を入力してください！';return;}
+  let nation=selCode?findC(selCode):txt?findN(txt):null;
+  if(!nation){err.textContent='② Select or type country below / 国を選択または入力してください';return;}
+  if(players.length>=8&&!players.find(p=>p.id===nation.c)){err.textContent='Max 8 countries / 最大8カ国';return;}
+  err.textContent='';
+  const ex=players.find(p=>p.id===nation.c);
+  if(ex){ex.nicks.push(nick);}
+  else{players.push({id:nation.c,code:nation.c,name:nation.n,nicks:[nick],col:PAL[players.length%8]});}
+  document.getElementById('nickIn').value='';
+  sel.value='';
+  document.getElementById('ctText').value='';
+  document.getElementById('startBtn').disabled=(players.length<2);
+  loadImg(nation.c).then(i=>{if(i)IR[nation.c]=i;renderChips();showEntry(nation.c,nick,nation.n,ex?'joined the team! / チームに加わった！':' joined the battle! / が参戦！');});
+  renderChips();
+}
+function removeP(id){
+  players=players.filter(p=>p.id!==id);
+  players.forEach((p,i)=>p.col=PAL[i%8]);
+  renderChips();
+  document.getElementById('startBtn').disabled=(players.length<2);
+}
+function renderChips(){
+  document.getElementById('chips').innerHTML=players.map(p=>`
+    <div class="chip" style="background:${p.col.bg}33;border-color:${p.col.bo};">
+      ${fTag(p.code,22,14)}
+      <span style="color:#eee;">${p.name}</span>
+      <span style="color:${p.col.bo};font-size:10px;"> ${p.nicks.join('・')}</span>
+      <span style="cursor:pointer;color:#888;margin-left:3px;font-size:15px;line-height:1;" onclick="removeP('${p.id}')">×</span>
+    </div>`).join('');
+}
+
+// Enterキー対応
+document.getElementById('nickIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('ctSelect').focus();}});
+document.getElementById('ctText').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doAdd();}});
+
+// 参戦演出
+let entTO=null;
+function showEntry(code,nick,cn,msg){
+  const i=gImg(code);
+  document.getElementById('entryImg').src=i?i.src:fUrl(code);
+  document.getElementById('entryName').textContent=nick+'  joined the battle! / が参戦！';
+  document.getElementById('entrySub').textContent=cn+' '+msg;
+  document.getElementById('entryOv').classList.add('show');
+  playSnd('entry');
+  if(entTO)clearTimeout(entTO);
+  entTO=setTimeout(()=>document.getElementById('entryOv').classList.remove('show'),2500);
+}
+
+// サウンド
+let AC=null,sndOn=true;
+function gAC(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return AC;}
+function note(f,t,v=0.12,d=0.7){
+  try{
+    const c=gAC();if(!c)return;if(c.state==='suspended')c.resume();
+    const p=(fr,vo,du)=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=fr;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vo,t+0.004);g.gain.exponentialRampToValueAtTime(vo*0.3,t+0.03);g.gain.exponentialRampToValueAtTime(0.0001,t+du);o.start(t);o.stop(t+du+0.02);};
+    p(f,v,d);p(f*2.756,v*0.4,d*0.3);p(f*5.4,v*0.12,0.06);
+  }catch(e){}
+}
+const SC=[[1046.5,1174.66,1318.51,1396.91,1567.98,1760,1975.53,2093],[783.99,880,987.77,1046.5,1174.66,1318.51,1479.98,1567.98],[880,987.77,1108.73,1174.66,1318.51,1479.98,1661.22,1760],[698.46,783.99,880,932.33,1046.5,1174.66,1318.51,1396.91],[987.77,1108.73,1244.51,1318.51,1479.98,1661.22,1864.65,1975.53],[932.33,1046.5,1174.66,1244.51,1396.91,1567.98,1760,1864.65],[830.61,932.33,1046.5,1108.73,1244.51,1396.91,1567.98,1661.22],[739.99,830.61,932.33,987.77,1108.73,1244.51,1396.91,1479.98]];
+function playSnd(type,pi=0,fi=0,tot=1){
+  if(!sndOn)return;
+  try{
+    const c=gAC();if(!c)return;if(c.state==='suspended')c.resume();const t=c.currentTime;
+    if(type==='place'){SC[pi%8].forEach((f,i)=>note(f,t+i*0.05,0.11,0.75));}
+    else if(type==='flip'){const s=SC[pi%8];const si=Math.round(fi/Math.max(tot-1,1)*(s.length-1));note(s[Math.min(si,s.length-1)],t,0.08+0.04*(fi/Math.max(tot-1,1)),0.5);}
+    else if(type==='result'){[1046.5,1174.66,1318.51,1396.91,1567.98,1760,1975.53,2093,2349.32].forEach((f,i)=>note(f,t+i*0.065,0.14,1.1));}
+    else if(type==='entry'){[523.25,659.25,783.99,1046.5].forEach((f,i)=>setTimeout(()=>{const c2=gAC();if(c2)note(f,c2.currentTime,0.18,0.4);},i*80));}
+    else if(type==='cheer'){note(880,t,0.12,0.25);note(1100,t+0.08,0.1,0.2);}
+  }catch(e){}
+}
+function toggleSnd(){sndOn=!sndOn;document.getElementById('sndBtn').innerHTML=sndOn?'🔊 Sound ON<br><span style="font-size:0.7em;">音あり</span>':'🔇 Sound OFF<br><span style="font-size:0.7em;">音なし</span>';}
+
+// ゲーム変数
+let board=null,turnIdx=0,hints=false,gameOver=false,animating=false;
+let gPs=[],cv=null,cx=null,CW=0,CH=0;
+let lastMove=0,gTmr=null,skipTmr=null,skipSec=60,cheerData={},popCode=null;
+const RESET_MS=5*60*1000;
+
+function isL(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS&&GR[r][c]===1;}
+function isCo(r,c){return DIR.some(([dr,dc])=>{const nr=r+dr,nc=c+dc;return nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&GR[nr][nc]===0;});}
+function getFlips(r,c,id){
+  if(!isL(r,c)||board[r][c])return[];
+  const fl=[];
+  for(const[dr,dc]of DIR){let tr=r+dr,tc=c+dc,ln=[];while(isL(tr,tc)){const t=board[tr][tc];if(!t)break;if(t===id){if(ln.length)fl.push(...ln);break;}ln.push([tr,tc]);tr+=dr;tc+=dc;}}
+  return fl;
+}
+function isSetup(){return turnIdx<gPs.length;}
+function curTeam(){return gPs[turnIdx%gPs.length];}
+function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+
+function startSkip(){
+  stopSkip();skipSec=60;updSkipUI();
+  skipTmr=setInterval(()=>{skipSec--;updSkipUI();if(skipSec<=0){stopSkip();doSkip();}},1000);
+}
+function stopSkip(){if(skipTmr){clearInterval(skipTmr);skipTmr=null;}}
+function updSkipUI(){
+  const f=document.getElementById('tfill');const info=document.getElementById('tinfo');
+  if(!f||!info||gameOver)return;
+  f.style.width=(skipSec/60*100)+'%';
+  f.style.background=skipSec>30?'#44cc44':skipSec>10?'#ff9900':'#ff4444';
+  const cur=curTeam();if(!cur)return;
+  const col=skipSec>30?'#44cc44':skipSec>10?'#ff9900':'#ff4444';
+  info.innerHTML=`⏱ <b style="color:${col};">${skipSec}sec</b> remaining for <b>${cur.name}</b>（${cur.nicks.join('・')}) to place or skip<br><span style="font-size:0.85em;">）が置かなければスキップ</span>`;
+}
+function doSkip(){const cur=curTeam();setLive(`⏩ ${cur?cur.name:''} timed out! Next team / タイムアウト！次のチームへ`);turnIdx++;updBanner();updBorder();startSkip();lastMove=Date.now();}
+function startGlobal(){
+  lastMove=Date.now();if(gTmr)clearInterval(gTmr);
+  gTmr=setInterval(()=>{if(gameOver){clearInterval(gTmr);return;}if(Date.now()-lastMove>RESET_MS){clearInterval(gTmr);autoReset();}},5000);
+}
+function autoReset(){
+  setLive('⏰ 5 min no action — Auto Reset! / 自動リセット！');
+  setTimeout(()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(null));turnIdx=0;gameOver=false;animating=false;initCheer();drawMap();updSB();updBanner();updBorder();renderCheer();setLive('🔄 Reset<br><span style="font-size:0.7em;">リセット</span>！新たな戦いが始まる！');startGlobal();startSkip();},2000);
+}
+
+function initCheer(){cheerData={};gPs.forEach(p=>{cheerData[p.id]=20+Math.floor(Math.random()*25);});}
+function addCheer(id){cheerData[id]=Math.min(100,(cheerData[id]||0)+10);renderCheer();playSnd('cheer');const p=gPs.find(x=>x.id===id);if(p)setLive(`🎉 ${p.name}'s cheer gauge up! / への応援ゲージ上昇！`);}
+function renderCheer(){
+  if(!gPs.length)return;
+  document.getElementById('cheerEl').innerHTML=gPs.map(p=>{
+    const ns=p.nicks.slice(0,2).join('・')+(p.nicks.length>2?` +${p.nicks.length-2}人`:'');
+    return`<div class="crow">${fTag(p.code,18,12)}<div class="cname">${p.name}<br><span style="font-size:8px;color:#888;">${ns}</span></div><div class="cbg"><div class="cbar" style="width:${cheerData[p.id]||0}%;background:${p.col.bg};"></div></div><div class="cpct">${cheerData[p.id]||0}%</div><button class="cbtn" onclick="addCheer('${p.id}')">📣</button></div>`;
+  }).join('');
+}
+
+function drawMap(){
+  if(!cx||!board||!gPs.length)return;
+  cx.fillStyle='#1a3a6e';cx.fillRect(0,0,cv.width,cv.height);
+  const cur=curTeam();
+  for(let r=0;r<ROWS;r++){for(let c=0;c<COLS;c++){
+    const x=c*CW,y=r*CH;
+    if(!isL(r,c)){cx.fillStyle=r<3||r>18?'#122a5e':'#1a3a6e';cx.fillRect(x,y,CW,CH);continue;}
+    const ow=board[r][c];const tm=ow?gPs.find(p=>p.id===ow):null;
+    cx.fillStyle=tm?tm.col.fi:isCo(r,c)?'#d4c47a':'#5cb85c';cx.fillRect(x,y,CW,CH);
+    if(!tm){cx.fillStyle='#4a9a4a';if((r*3+c*7)%5===0)cx.fillRect(x+1,y+1,1,2);if((r*5+c*3)%7===0)cx.fillRect(x+CW-2,y+2,1,2);}
+    if(hints&&!gameOver&&cur&&!ow&&getFlips(r,c,cur.id).length>0){cx.fillStyle='rgba(255,255,80,0.45)';cx.fillRect(x,y,CW,CH);}
+    if(tm){const img=gImg(tm.code);if(img&&img.naturalWidth>0){const fw=Math.max(8,Math.min(CW-2,18));const fh=Math.round(fw*0.67);const fx=x+Math.floor((CW-fw)/2);const fy=y+Math.floor((CH-fh)/2);cx.drawImage(img,fx,fy,fw,fh);cx.strokeStyle='rgba(255,255,255,0.28)';cx.lineWidth=0.5;cx.strokeRect(fx,fy,fw,fh);}else{cx.fillStyle=tm.col.bg;cx.fillRect(x+2,y+2,CW-4,CH-4);}}
+    cx.strokeStyle='rgba(0,0,0,0.12)';cx.lineWidth=0.5;cx.strokeRect(x,y,CW,CH);
+  }}
+}
+
+function getScores(){const s={};gPs.forEach(p=>s[p.id]=0);for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(board[r][c]&&s[board[r][c]]!==undefined)s[board[r][c]]++;}return s;}
+function updSB(){
+  const sc=getScores();const cur=gameOver?null:curTeam();
+  document.getElementById('sb').innerHTML=gPs.map(p=>{
+    const on=cur&&p.id===cur.id;
+    const ns=p.nicks.slice(0,2).join('・')+(p.nicks.length>2?` +${p.nicks.length-2}人`:'');
+    return`<div class="scard ${on?'on':''}" style="background:${p.col.bg}22;border-color:${on?p.col.bg:'#2a3a5e'};" onclick="showPop('${p.id}')">${fTag(p.code,32,21)}<div class="ss" style="color:${p.col.bg};">${sc[p.id]}</div><div class="sn">${p.name}</div><div class="sk" style="color:${on?p.col.bg:'#777'};">${on?'▶ Now playing / 今の番':ns}</div></div>`;
+  }).join('');
+}
+function updBanner(){
+  if(gameOver)return;const cur=curTeam();if(!cur)return;
+  const who=cur.nicks.slice(0,3).join('・')+(cur.nicks.length>3?` +他${cur.nicks.length-3}人`:'');
+  const b=document.getElementById('tbanner');
+  b.innerHTML=`${fTag(cur.code,28,19)}<div class="tt"><b style="color:${cur.col.bg};font-size:14px;">${cur.name}</b>（${who}）'s turn! Anyone can play<br><span style="font-size:0.8em;">の番！誰でも置けます</span>${isSetup()?' — Place your first piece / 初期配置':''}</div>`;
+  b.style.background=cur.col.bg+'22';b.style.borderColor=cur.col.bg;
+}
+function updBorder(){
+  if(gameOver)return;const cur=curTeam();if(!cur)return;
+  const w=document.getElementById('mapwrap');
+  w.style.borderColor=cur.col.bg;w.style.boxShadow=`0 0 0 2px ${cur.col.bg}44,0 0 12px ${cur.col.bg}55`;
+}
+function setLive(t){const el=document.getElementById('live');if(el)el.textContent=t;}
+function updLegend(){document.getElementById('legend').innerHTML=gPs.map(p=>`<div class="lchip" style="background:${p.col.bg}22;border-color:${p.col.bo};">${fTag(p.code,16,11)}<span style="color:#eee;">${p.name}</span></div>`).join('');}
+
+function showPop(id){
+  const p=gPs.find(x=>x.id===id);if(!p)return;popCode=id;
+  const sc=getScores();const img=gImg(p.code);
+  document.getElementById('popImg').src=img?img.src:fUrl(p.code);
+  document.getElementById('popTtl').textContent=p.name;
+  document.getElementById('popCnt').textContent=p.nicks.length+' players in / 人参戦中';
+  document.getElementById('popScore').textContent=sc[id]+'cells / マス';
+  const cur=curTeam();
+  document.getElementById('popMembers').innerHTML=p.nicks.map((n,i)=>`<div class="mitem"><div class="mnum">${i+1}</div><div class="mname">${n}</div>${cur&&cur.id===id&&i===0?'<div class="mbadge">▶ Now / 番</div>':''}</div>`).join('');
+  document.getElementById('popOv').classList.add('show');
+}
+function closePop(){document.getElementById('popOv').classList.remove('show');popCode=null;}
+function joinFromPop(){closePop();document.getElementById('midSec').style.display='block';}
+
+function handleTap(clientX,clientY){
+  if(gameOver||animating||!board||!gPs.length||!cv)return;
+  const rect=cv.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  const c=Math.floor((clientX-rect.left)*(cv.width/rect.width)/CW);
+  const r=Math.floor((clientY-rect.top)*(cv.height/rect.height)/CH);
+  if(r<0||r>=ROWS||c<0||c>=COLS)return;
+  if(!isL(r,c)){setLive('🌊 Cannot place on sea! / 海には置けません！');return;}
+  if(board[r][c]){setLive('⛔ Already occupied! / すでに占領済み！');return;}
+  const cur=curTeam();const pi=gPs.indexOf(cur);const nick=rnd(cur.nicks);
+  lastMove=Date.now();stopSkip();
+  try{const ac=gAC();if(ac&&ac.state==='suspended')ac.resume();}catch(e){}
+  if(isSetup()){
+    board[r][c]=cur.id;playSnd('place',pi);turnIdx++;
+    drawMap();updSB();updBanner();updBorder();
+    setLive(`🏳️ ${nick} planted the ${cur.name} flag!${turnIdx>=gPs.length?' / Let us go!':''}`)
+  }
+  const flips=getFlips(r,c,cur.id);board[r][c]=cur.id;playSnd('place',pi);drawMap();
+  if(!flips.length){turnIdx++;updSB();updBanner();updBorder();setLive(`${nick} holds the line... /  holds the line / が陣地を固める…`);startSkip();checkFull();return;}
+  const tot=flips.length;const iv=Math.max(55,100-tot*3);animating=true;
+  setLive(tot>=5?rnd([`⚡ ${nick}が${tot}マス massive capture!! / 大量奪取！！`,`🔥 ${nick}'s fierce attack! / の猛攻！${tot} cells seized! /  cells seized! / マス制圧！`]):tot>=3?rnd([`🎯 ${nick}が${tot} cells captured! / マス奪取！`]):`${nick}が${tot} cells taken! / マスを奪った！`);
+  flips.forEach(([fr,fc],i)=>{setTimeout(()=>{playSnd('flip',pi,i,tot);board[fr][fc]=cur.id;drawMap();updSB();},i*iv);});
+  setTimeout(()=>{animating=false;turnIdx++;updSB();updBanner();updBorder();startSkip();checkFull();},tot*iv+250);
+}
+
+const gcEl=document.getElementById('gc');
+gcEl.addEventListener('click',e=>{e.preventDefault();handleTap(e.clientX,e.clientY);});
+gcEl.addEventListener('touchend',function(e){e.preventDefault();if(e.changedTouches.length>0){const t=e.changedTouches[0];handleTap(t.clientX,t.clientY);}},{passive:false});
+
+function checkFull(){
+  let n=0;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(isL(r,c)&&board[r][c])n++;}
+  if(n>=LTOTAL){gameOver=true;stopSkip();if(gTmr)clearInterval(gTmr);setTimeout(()=>{playSnd('result');showResult();},600);}
+}
+function showResult(){
+  document.getElementById('gameSec').style.display='none';document.getElementById('resultSec').style.display='block';
+  const sc=getScores();const rk=[...gPs].map(p=>({...p,score:sc[p.id]})).sort((a,b)=>b.score-a.score);
+  const mx=rk[0].score;const mvp=rk[0];const mvpN=rnd(mvp.nicks);
+  const md=['🥇','🥈','🥉','4位','5位','6位','7位','8位'];
+  window._sT=`🏰 FLAG KINGDOMで${mvpN}（${mvp.name}）が優勝！${mvp.score} cells conquered! / マス制覇！ #FlagKingdom`;
+  document.getElementById('resultEl').innerHTML=`
+    <div style="font-size:18px;font-weight:900;text-align:center;margin-bottom:8px;color:#f5a623;">🏆 GAME OVER! / ゲーム終了！</div>
+    <div class="mvpband"><div class="ml">👑 MVP</div><div class="mn">${mvpN}</div><div class="ms">${mvp.name} · ${mvp.score} cells conquered! / マス制覇！</div></div>
+    ${rk.map((p,i)=>`<div class="rrow" style="background:${p.col.bg}22;border:1.5px solid ${p.col.bo};"><div class="rnum">${md[i]}</div>${fTag(p.code,30,20)}<div class="rname" style="color:#eee;">${p.name}<br><span style="font-size:9px;color:#888;">${p.nicks.join('・')}</span></div><div class="rbg"><div class="rbar" style="width:${Math.round(p.score/mx*100)}%;background:${p.col.bg};"></div></div><div class="rscore" style="color:${p.col.bg};">${p.score}マス</div></div>`).join('')}
+    <div class="sharerow">
+      <button class="sharex" onclick="window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(window._sT),'_blank')">𝕏 Share on X / Xでシェア</button>
+      <button class="sharec" onclick="doCopy()">📋 Copy / コピー</button>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:rgba(245,166,35,0.1);border:1.5px solid #f5a623;border-radius:10px;text-align:center;">
+      <div style="font-size:12px;color:#f5a623;font-weight:700;margin-bottom:8px;">☕ このゲームが楽しかったら作者を応援してください！</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="window.open('https://ofuse.me/YOUR_ID','_blank')" style="flex:1;padding:10px;border:none;border-radius:8px;background:#1DA1F2;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🎁 Ofuseで投げ銭</button>
+        <button onclick="window.open('https://www.buymeacoffee.com/YOUR_ID','_blank')" style="flex:1;padding:10px;border:none;border-radius:8px;background:#FFDD00;color:#000;font-size:13px;font-weight:700;cursor:pointer;">☕ Buy Me a Coffee</button>
+      </div>
+    </div>`;
+}
+function doCopy(){if(navigator.clipboard){navigator.clipboard.writeText(window._sT||'').then(()=>alert('コピーしました！')).catch(()=>alert(window._sT||''));}else{alert(window._sT||'');}}
+
+async function startGame(){
+  if(players.length<2){document.getElementById('errMsg').textContent='2 or more countries needed / 2カ国以上必要';return;}
+  gPs=[...players];
+  const btn=document.getElementById('startBtn');
+  btn.textContent='🏳️ Loading flags... / 国旗を読み込み中…';btn.disabled=true;
+  try{const ac=gAC();if(ac&&ac.state==='suspended')await ac.resume();}catch(e){}
+  await preloadAll(gPs.map(p=>p.code));
+  btn.innerHTML='🚀 GAME START！🏰<br><span style="font-size:0.75em;">ゲームスタート！</span>';btn.disabled=false;
+  board=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  turnIdx=0;hints=false;gameOver=false;animating=false;initCheer();
+  document.getElementById('joinSec').style.display='none';
+  document.getElementById('resultSec').style.display='none';
+  document.getElementById('gameSec').style.display='block';
+  setTimeout(()=>{
+    cv=document.getElementById('gc');cx=cv.getContext('2d');
+    const wrap=document.getElementById('mapwrap');
+    const ww=Math.max(200,wrap.getBoundingClientRect().width||300);
+    CW=Math.max(12,Math.floor((ww-8)/COLS));
+    CH=Math.max(9,Math.floor(CW*0.78));
+    cv.width=COLS*CW;cv.height=ROWS*CH;
+    updLegend();updSB();updBanner();updBorder();renderCheer();drawMap();
+    setLive('⚔️ FLAG KINGDOM begins! Make your first move! / 最初の一手を！');
+    startGlobal();startSkip();
+  },200);
+}
+
+function toggleMid(){const p=document.getElementById('midSec');p.style.display=p.style.display==='none'?'block':'none';}
+function doMidJoin(){
+  const nick=document.getElementById('midNick').value.trim();
+  const code=document.getElementById('midSel').value;
+  const err=document.getElementById('midErr');
+  if(!nick){err.textContent='Enter your name / 名前を入力してください';return;}
+  if(!code){err.textContent='Please select a country / 国を選んでください';return;}
+  err.textContent='';
+  const nation=findC(code);if(!nation)return;
+  const ex=gPs.find(p=>p.id===code);
+  if(ex){ex.nicks.push(nick);}
+  else{if(gPs.length>=8){err.textContent='Max 8 countries / 最大8カ国まで';return;}const np={id:code,code,name:nation.n,nicks:[nick],col:PAL[gPs.length%8]};gPs.push(np);players.push(np);cheerData[code]=25;}
+  document.getElementById('midNick').value='';
+  document.getElementById('midSel').value='';
+  document.getElementById('midSec').style.display='none';
+  loadImg(code).then(i=>{if(i)IR[code]=i;drawMap();updSB();updLegend();renderCheer();showEntry(code,nick,nation.n,ex?'joined the team mid-game! / チームに途中参戦！':' joined as new country! / 新国として参戦！');});
+  updLegend();updSB();renderCheer();setLive(`🔥 ${nick}が${nation.n} joined mid-game! / で途中参戦！`);
+}
+
+function confirmReset(){if(confirm('Reset? / リセットしますか？'))doReset();}
+function doReset(){
+  stopSkip();if(gTmr)clearInterval(gTmr);
+  players=[];gPs=[];board=null;turnIdx=0;gameOver=false;animating=false;
+  document.getElementById('chips').innerHTML='';
+  document.getElementById('startBtn').disabled=true;
+  document.getElementById('errMsg').textContent='';
+  document.getElementById('ctSelect').value='';
+  document.getElementById('gameSec').style.display='none';
+  document.getElementById('resultSec').style.display='none';
+  document.getElementById('joinSec').style.display='block';
+}
+function toggleHint(){hints=!hints;document.getElementById('hintBtn').innerHTML=hints?'💡 Hint<br><span style="font-size:0.7em;">ヒント</span>OFF':'💡 Hint<br><span style="font-size:0.7em;">ヒント</span>';drawMap();}
+let rszT=null;
+window.addEventListener('resize',()=>{if(!cv||!board)return;clearTimeout(rszT);rszT=setTimeout(()=>{const w=document.getElementById('mapwrap');const ww=Math.max(200,w.getBoundingClientRect().width||300);CW=Math.max(12,Math.floor((ww-8)/COLS));CH=Math.max(9,Math.floor(CW*0.78));cv.width=COLS*CW;cv.height=ROWS*CH;drawMap();},300);});
+</script>
+</body>
+</html>
