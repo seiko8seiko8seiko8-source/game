@@ -16,25 +16,8 @@ html,body{background:#1a1a2e;color:#fff;font-family:-apple-system,BlinkMacSystem
 .ctitle{font-size:13px;font-weight:700;color:#f5a623;margin-bottom:8px;}
 .fg{margin-bottom:10px;}
 .fg label{display:block;font-size:13px;color:#aaa;margin-bottom:5px;}
-/* iPhone対応: font-size:16px でズーム防止 */
-.fg input,.fg select{
-  display:block;
-  width:100%;
-  font-size:16px;
-  padding:12px;
-  border:2px solid #2a3a5e;
-  border-radius:9px;
-  background:#0f3460;
-  color:#fff;
-  outline:none;
-  /* iOSのデフォルトスタイルを保持（-webkit-appearance:noneは使わない） */
-  -webkit-appearance:menulist-button;
-  appearance:menulist;
-}
-.fg input{
-  -webkit-appearance:none;
-  appearance:none;
-}
+.fg input,.fg select{display:block;width:100%;font-size:16px;padding:12px;border:2px solid #2a3a5e;border-radius:9px;background:#0f3460;color:#fff;outline:none;-webkit-appearance:menulist-button;appearance:menulist;}
+.fg input{-webkit-appearance:none;appearance:none;}
 .fg input:focus,.fg select:focus{border-color:#e94560;}
 .fg input::placeholder{color:#6677aa;}
 .fg select option{background:#0f3460;color:#fff;}
@@ -111,16 +94,16 @@ html,body{background:#1a1a2e;color:#fff;font-family:-apple-system,BlinkMacSystem
   <img id="entryImg" src="" alt="">
   <div class="ename" id="entryName"></div>
   <div class="esub" id="entrySub"></div>
-  <div class="etap">タップで閉じる</div>
+  <div class="etap" id="etapTxt">Tap to close / タップで閉じる</div>
 </div>
 
 <div id="popOv" class="ov" onclick="if(event.target===this)closePop()">
   <div class="popbox">
     <div class="pophead"><img id="popImg" src="" alt=""><div><div class="popttl" id="popTtl"></div><div class="popcnt" id="popCnt"></div></div></div>
-    <div class="popsc">Cells: / マス数：<span id="popScore">0</span></div>
+    <div class="popsc"><span id="popCellsLbl">Cells</span>: <span id="popScore">0</span></div>
     <div id="popMembers"></div>
-    <button class="popjoin" onclick="joinFromPop()">🔥 Join this team! / このチームに参戦！</button>
-    <button class="popclose" onclick="closePop()">✕ Close / 閉じる</button>
+    <button class="popjoin" id="popJoinBtn" onclick="joinFromPop()">🔥 Join this team!</button>
+    <button class="popclose" id="popCloseBtn" onclick="closePop()">✕ Close</button>
   </div>
 </div>
 
@@ -129,31 +112,31 @@ html,body{background:#1a1a2e;color:#fff;font-family:-apple-system,BlinkMacSystem
     <div style="font-size:22px;">👑</div>
     <h1>🏰 FLAG KINGDOM 🌍</h1>
     <div class="fl">🇯🇵🇺🇸🇫🇷🇧🇷🇩🇪🇰🇷</div>
-    <div class="sub">✨ Conquer the world with your flag! ✨<br><span style="font-size:0.8em;color:#aaa;">世界の国旗で陣地を制覇せよ！</span></div>
+    <div class="sub" id="ttlSub">✨ Conquer the world with your flag! ✨</div>
   </div>
 
   <div id="joinSec" class="card">
-    <div class="ctitle">⚔️ Register to Play (2–8 Countries)<br><span style="font-size:0.75em;color:rgba(245,166,35,0.8);">参加登録（2〜8カ国）</span></div>
+    <div class="ctitle" id="joinTitle">⚔️ Register to Play (2–8 Countries)</div>
     <div class="fg">
-      <label>① Enter your name / あなたのEnter name / 名前を入力</label>
-      <input type="text" id="nickIn" placeholder="e.g. Yuka, Tom, Sakura / 例：ユウカ、トム" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <label id="lblName">① Enter your name</label>
+      <input type="text" id="nickIn" placeholder="e.g. Yuka, Tom, Sakura" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
     <div class="fg">
-      <label>② Select your country / 国を選択（リストから選ぶ）</label>
-      <select id="ctSelect" size="1">
-        <option value="">▼ Select a country / 国を選んでください</option>
+      <label id="lblCountry">② Select your country</label>
+      <select id="ctSelect" size="1" onchange="onCountrySelect(this.value)">
+        <option value="" id="selPlaceholder">▼ Select a country</option>
       </select>
     </div>
-    <div class="divtxt">── Or type country name directly / または国名を直接入力 ──</div>
+    <div class="divtxt" id="divOrText">── Or type country name directly ──</div>
     <div class="frow">
       <div class="fg">
-        <input type="text" id="ctText" placeholder="Greece, Mali, Japan… / ギリシャ、まり…" maxlength="30" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="ctText" placeholder="Greece, Mali, Japan…" maxlength="30" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
-      <button class="btn-join" onclick="doAdd()">Join！🔥<br><span style="font-size:0.7em;">参戦！</span></button>
+      <button class="btn-join" id="btnJoin" onclick="doAdd()">Join！🔥</button>
     </div>
     <div class="errmsg" id="errMsg"></div>
     <div class="chips" id="chips"></div>
-    <button class="btn-start" id="startBtn" onclick="startGame()" disabled>🚀 GAME START！🏰<br><span style="font-size:0.75em;">ゲームスタート！</span></button>
+    <button class="btn-start" id="startBtn" onclick="startGame()" disabled>🚀 GAME START！🏰</button>
   </div>
 
   <div id="gameSec" style="display:none;">
@@ -162,43 +145,1137 @@ html,body{background:#1a1a2e;color:#fff;font-family:-apple-system,BlinkMacSystem
     <div class="tbanner" id="tbanner"></div>
     <div class="tbar"><div class="tfill" id="tfill" style="width:100%;"></div></div>
     <div class="tinfo" id="tinfo"></div>
-    <div class="live" id="live">⚔️ Battle is ready! / 戦場の準備完了！</div>
+    <div class="live" id="live">⚔️ Battle is ready!</div>
     <div class="mapwrap" id="mapwrap"><canvas id="gc"></canvas></div>
     <div class="card">
-      <div class="ctitle">🎉 Cheer Gauge / 応援ゲージ</div>
+      <div class="ctitle" id="cheerTitle">🎉 Cheer Gauge</div>
       <div id="cheerEl"></div>
     </div>
     <div id="midSec" class="card" style="display:none;">
-      <div class="ctitle">⚔️ Join Mid-Game! (Game continues)<br><span style="font-size:0.75em;color:rgba(245,166,35,0.8);">途中参戦！（ゲームは続きから）</span></div>
+      <div class="ctitle" id="midTitle">⚔️ Join Mid-Game!</div>
       <div class="fg">
-        <label>Name / 名前</label>
-        <input type="text" id="midNick" placeholder="Enter name / 名前を入力" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <label id="midLblName">Name</label>
+        <input type="text" id="midNick" placeholder="Enter name" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
       <div class="fg">
-        <label>Country / 国を選択</label>
+        <label id="midLblCountry">Country</label>
         <select id="midSel" size="1">
-          <option value="">▼ Select a country / 国を選んでください</option>
+          <option value="" id="midSelPlaceholder">▼ Select a country</option>
         </select>
       </div>
       <div class="errmsg" id="midErr"></div>
-      <button class="btn-join" style="width:100%;padding:12px;font-size:16px;" onclick="doMidJoin()">このチームでJoin！🔥<br><span style="font-size:0.7em;">参戦！</span></button>
+      <button class="btn-join" id="midJoinBtn" style="width:100%;padding:12px;font-size:16px;" onclick="doMidJoin()">Join this team！🔥</button>
     </div>
     <div class="ctrl">
-      <button class="btn-ctrl" onclick="toggleMid()">➕ Join<br><span style="font-size:0.7em;">途中参戦</span></button>
-      <button class="btn-ctrl" id="hintBtn" onclick="toggleHint()">💡 Hint<br><span style="font-size:0.7em;">ヒント</span></button>
-      <button class="btn-ctrl" id="sndBtn" onclick="toggleSnd()">🔊 Sound ON<br><span style="font-size:0.7em;">音あり</span></button>
-      <button class="btn-ctrl" style="color:#e94560;" onclick="confirmReset()">🔄 Reset<br><span style="font-size:0.7em;">リセット</span></button>
+      <button class="btn-ctrl" id="midToggleBtn" onclick="toggleMid()">➕ Join</button>
+      <button class="btn-ctrl" id="hintBtn" onclick="toggleHint()">💡 Hint</button>
+      <button class="btn-ctrl" id="sndBtn" onclick="toggleSnd()">🔊 Sound ON</button>
+      <button class="btn-ctrl" id="resetBtn" style="color:#e94560;" onclick="confirmReset()">🔄 Reset</button>
     </div>
   </div>
 
   <div id="resultSec" style="display:none;">
     <div class="card" id="resultEl"></div>
-    <div class="ctrl"><button class="btn-ctrl" onclick="doReset()">🔄 Play Again！<br><span style="font-size:0.7em;">もう一度！</span></button></div>
+    <div class="ctrl"><button class="btn-ctrl" id="playAgainBtn" onclick="doReset()">🔄 Play Again！</button></div>
   </div>
 </div>
 
 <script>
+// =============================================
+// 多言語辞書データ（100カ国対応）
+// =============================================
+const LANG_DICT = {
+  // 日本語
+  ja:{
+    subtl:'✨ 世界の国旗で陣地を制覇せよ！ ✨',
+    joinTitle:'⚔️ 参加登録（2〜8カ国）',
+    lblName:'① あなたの名前を入力',
+    lblCountry:'② 国を選択（リストから選ぶ）',
+    divOr:'── または国名を直接入力 ──',
+    nickPh:'例：ユウカ、トム、さくら',
+    ctPh:'ギリシャ、まり、mali…',
+    btnJoin:'参戦！🔥',
+    btnStart:'🚀 ゲームスタート！🏰',
+    selPh:'▼ 国を選んでください',
+    cheerTitle:'🎉 応援ゲージ',
+    midTitle:'⚔️ 途中参戦！（ゲームは続きから）',
+    midLblName:'名前',
+    midLblCountry:'国を選択',
+    midNickPh:'名前を入力',
+    midJoinBtn:'このチームで参戦！🔥',
+    midToggle:'➕ 途中参戦',
+    hint:'💡 ヒント',
+    hintOff:'💡 ヒントOFF',
+    sndOn:'🔊 音あり',
+    sndOff:'🔇 音なし',
+    resetBtn:'🔄 リセット',
+    playAgain:'🔄 もう一度！',
+    popCells:'マス数',
+    popJoin:'🔥 このチームに参戦！',
+    popClose:'✕ 閉じる',
+    tapClose:'タップで閉じる',
+    battleReady:'⚔️ 戦場の準備完了！',
+    noSea:'🌊 海には置けません！',
+    occupied:'⛔ すでに占領済み！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick}が${cn}の旗を立てた！`,
+    letsGo:'さあ、本番だ！',
+    holdsLine:(nick)=>`${nick}が陣地を固める…`,
+    timeout:(cn)=>`⏩ ${cn} タイムアウト！次のチームへ`,
+    autoReset:'⏰ 5分間操作なし — 自動リセット！',
+    resetDone:'🔄 リセット！新たな戦いが始まる！',
+    gameBegin:'⚔️ FLAG KINGDOM 開幕！最初の一手を！',
+    bigCapture:(nick,n)=>`⚡ ${nick}が${n}マス大量奪取！！`,
+    attack:(nick,n)=>`🔥 ${nick}の猛攻！${n}マス制圧！`,
+    capture3:(nick,n)=>`🎯 ${nick}が${n}マス奪取！`,
+    capture1:(nick,n)=>`${nick}が${n}マスを奪った！`,
+    cheerUp:(cn)=>`🎉 ${cn}への応援ゲージ上昇！`,
+    midJoined:(nick,cn)=>`🔥 ${nick}が${cn}で途中参戦！`,
+    joined:(nick)=>`${nick} が参戦！`,
+    joinedMsg:(cn)=>`${cn} が戦場に降り立った！`,
+    joinedTeam:(cn)=>`${cn} チームに加わった！`,
+    nowTurn:'▶今の番',
+    turnMsg:(cn,who,setup)=>`${cn}（${who}）の番！誰でも置けます${setup?' — 初期配置':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}秒 以内に ${cn}（${who}）が置かなければスキップ`,
+    errNeedName:'名前を入力してください！',
+    errNeedCountry:'国を選択または入力してください',
+    errMax:'最大8カ国',
+    errNeedNameMid:'名前を入力してください',
+    errNeedCountryMid:'国を選んでください',
+    errMaxMid:'最大8カ国まで',
+    errMin:'2カ国以上必要',
+    loadingFlags:'🏳️ 国旗を読み込み中…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n}マス制覇！`,
+    gameOver:'🏆 GAME OVER！',
+    shareText:(nick,cn,n)=>`🏰 FLAG KINGDOMで${nick}（${cn}）が優勝！${n}マス制覇！ #FlagKingdom`,
+    shareX:'𝕏 Xでシェア',
+    shareCopy:'📋 コピー',
+    copied:'コピーしました！',
+    resetConfirm:'リセットしますか？',
+    supportMsg:'☕ このゲームが楽しかったら作者を応援してください！',
+    secRemain:(n,cn,who)=>`⏱ ${n}秒 ${cn}（${who}）が置かなければスキップ`,
+  },
+  // English
+  en:{
+    subtl:'✨ Conquer the world with your flag! ✨',
+    joinTitle:'⚔️ Register to Play (2–8 Countries)',
+    lblName:'① Enter your name',
+    lblCountry:'② Select your country',
+    divOr:'── Or type country name directly ──',
+    nickPh:'e.g. Yuka, Tom, Sakura',
+    ctPh:'Greece, Mali, Japan…',
+    btnJoin:'Join！🔥',
+    btnStart:'🚀 GAME START！🏰',
+    selPh:'▼ Select a country',
+    cheerTitle:'🎉 Cheer Gauge',
+    midTitle:'⚔️ Join Mid-Game! (Game continues)',
+    midLblName:'Name',
+    midLblCountry:'Country',
+    midNickPh:'Enter name',
+    midJoinBtn:'Join this team！🔥',
+    midToggle:'➕ Join',
+    hint:'💡 Hint',
+    hintOff:'💡 Hint OFF',
+    sndOn:'🔊 Sound ON',
+    sndOff:'🔇 Sound OFF',
+    resetBtn:'🔄 Reset',
+    playAgain:'🔄 Play Again！',
+    popCells:'Cells',
+    popJoin:'🔥 Join this team!',
+    popClose:'✕ Close',
+    tapClose:'Tap to close',
+    battleReady:'⚔️ Battle is ready!',
+    noSea:'🌊 Cannot place on the sea!',
+    occupied:'⛔ Already occupied!',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} planted the ${cn} flag!`,
+    letsGo:"Let's go!",
+    holdsLine:(nick)=>`${nick} holds the line…`,
+    timeout:(cn)=>`⏩ ${cn} timed out! Next team`,
+    autoReset:'⏰ 5 min no action — Auto Reset!',
+    resetDone:'🔄 Reset! New battle begins!',
+    gameBegin:'⚔️ FLAG KINGDOM begins! Make your first move!',
+    bigCapture:(nick,n)=>`⚡ ${nick} massive capture! ${n} cells!`,
+    attack:(nick,n)=>`🔥 ${nick} fierce attack! ${n} cells!`,
+    capture3:(nick,n)=>`🎯 ${nick} captured ${n} cells!`,
+    capture1:(nick,n)=>`${nick} took ${n} cells!`,
+    cheerUp:(cn)=>`🎉 ${cn} cheer gauge up!`,
+    midJoined:(nick,cn)=>`🔥 ${nick} joined ${cn} mid-game!`,
+    joined:(nick)=>`${nick} joined!`,
+    joinedMsg:(cn)=>`${cn} entered the battlefield!`,
+    joinedTeam:(cn)=>`Joined ${cn} team!`,
+    nowTurn:'▶ Now',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — Anyone can play!${setup?' — First piece':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}s left for ${cn} (${who}) or skip`,
+    errNeedName:'Enter your name!',
+    errNeedCountry:'Select or type a country',
+    errMax:'Max 8 countries',
+    errNeedNameMid:'Enter your name',
+    errNeedCountryMid:'Select a country',
+    errMaxMid:'Max 8 countries',
+    errMin:'Need 2 or more countries',
+    loadingFlags:'🏳️ Loading flags…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} cells conquered!`,
+    gameOver:'🏆 GAME OVER!',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) won FLAG KINGDOM! ${n} cells conquered! #FlagKingdom`,
+    shareX:'𝕏 Share on X',
+    shareCopy:'📋 Copy',
+    copied:'Copied!',
+    resetConfirm:'Reset the game?',
+    supportMsg:'☕ Enjoyed the game? Support the creator!',
+    secRemain:(n,cn,who)=>`⏱ ${n}s left — ${cn} (${who}) place or skip`,
+  },
+  // Français
+  fr:{
+    subtl:'✨ Conquérez le monde avec votre drapeau！ ✨',
+    joinTitle:'⚔️ Inscription (2–8 pays)',
+    lblName:'① Votre nom',
+    lblCountry:'② Sélectionnez votre pays',
+    divOr:'── Ou saisissez le nom du pays ──',
+    nickPh:'ex. Yuka, Tom, Sakura',
+    ctPh:'Grèce, Mali, Japon…',
+    btnJoin:'Rejoindre！🔥',
+    btnStart:'🚀 DÉMARRER！🏰',
+    selPh:'▼ Sélectionnez un pays',
+    cheerTitle:'🎉 Jauge de soutien',
+    midTitle:'⚔️ Rejoindre en cours de partie！',
+    midLblName:'Nom',
+    midLblCountry:'Pays',
+    midNickPh:'Entrez votre nom',
+    midJoinBtn:'Rejoindre cette équipe！🔥',
+    midToggle:'➕ Rejoindre',
+    hint:'💡 Indice',
+    hintOff:'💡 Indice OFF',
+    sndOn:'🔊 Son activé',
+    sndOff:'🔇 Son désactivé',
+    resetBtn:'🔄 Réinitialiser',
+    playAgain:'🔄 Rejouer！',
+    popCells:'Cases',
+    popJoin:'🔥 Rejoindre cette équipe！',
+    popClose:'✕ Fermer',
+    tapClose:'Appuyez pour fermer',
+    battleReady:'⚔️ La bataille est prête！',
+    noSea:'🌊 Impossible de placer sur la mer！',
+    occupied:'⛔ Déjà occupé！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} a planté le drapeau de ${cn}！`,
+    letsGo:'Allons-y！',
+    holdsLine:(nick)=>`${nick} tient sa position…`,
+    timeout:(cn)=>`⏩ ${cn} temps écoulé！ Équipe suivante`,
+    autoReset:'⏰ 5 min sans action — Réinitialisation auto！',
+    resetDone:'🔄 Réinitialisation！ Nouvelle bataille！',
+    gameBegin:'⚔️ FLAG KINGDOM commence！ Premier coup！',
+    bigCapture:(nick,n)=>`⚡ ${nick} capture massive！ ${n} cases！`,
+    attack:(nick,n)=>`🔥 Attaque féroce de ${nick}！ ${n} cases！`,
+    capture3:(nick,n)=>`🎯 ${nick} a capturé ${n} cases！`,
+    capture1:(nick,n)=>`${nick} a pris ${n} cases！`,
+    cheerUp:(cn)=>`🎉 Jauge de ${cn} monte！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} a rejoint ${cn}！`,
+    joined:(nick)=>`${nick} a rejoint！`,
+    joinedMsg:(cn)=>`${cn} entre dans la bataille！`,
+    joinedTeam:(cn)=>`A rejoint l'équipe ${cn}！`,
+    nowTurn:'▶ Tour',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — Tout le monde peut jouer！${setup?' — 1ère pièce':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}s pour ${cn} (${who}) ou passer`,
+    errNeedName:'Entrez votre nom！',
+    errNeedCountry:'Sélectionnez ou saisissez un pays',
+    errMax:'Max 8 pays',
+    errNeedNameMid:'Entrez votre nom',
+    errNeedCountryMid:'Sélectionnez un pays',
+    errMaxMid:'Max 8 pays',
+    errMin:'2 pays minimum',
+    loadingFlags:'🏳️ Chargement des drapeaux…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} cases conquises！`,
+    gameOver:'🏆 PARTIE TERMINÉE！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) a gagné FLAG KINGDOM！ ${n} cases！ #FlagKingdom`,
+    shareX:'𝕏 Partager sur X',
+    shareCopy:'📋 Copier',
+    copied:'Copié！',
+    resetConfirm:'Réinitialiser le jeu？',
+    supportMsg:'☕ Vous avez aimé？ Soutenez le créateur！',
+    secRemain:(n,cn,who)=>`⏱ ${n}s — ${cn} (${who}) jouer ou passer`,
+  },
+  // Deutsch
+  de:{
+    subtl:'✨ Erobere die Welt mit deiner Flagge！ ✨',
+    joinTitle:'⚔️ Anmeldung (2–8 Länder)',
+    lblName:'① Dein Name',
+    lblCountry:'② Wähle dein Land',
+    divOr:'── Oder Ländernamen eingeben ──',
+    nickPh:'z.B. Yuka, Tom, Sakura',
+    ctPh:'Griechenland, Mali…',
+    btnJoin:'Mitmachen！🔥',
+    btnStart:'🚀 SPIEL STARTEN！🏰',
+    selPh:'▼ Land auswählen',
+    cheerTitle:'🎉 Jubel-Anzeige',
+    midTitle:'⚔️ Mitten im Spiel beitreten！',
+    midLblName:'Name',
+    midLblCountry:'Land',
+    midNickPh:'Namen eingeben',
+    midJoinBtn:'Team beitreten！🔥',
+    midToggle:'➕ Beitreten',
+    hint:'💡 Hinweis',
+    hintOff:'💡 Hinweis AUS',
+    sndOn:'🔊 Ton AN',
+    sndOff:'🔇 Ton AUS',
+    resetBtn:'🔄 Zurücksetzen',
+    playAgain:'🔄 Nochmal spielen！',
+    popCells:'Felder',
+    popJoin:'🔥 Diesem Team beitreten！',
+    popClose:'✕ Schließen',
+    tapClose:'Tippen zum Schließen',
+    battleReady:'⚔️ Schlachtfeld bereit！',
+    noSea:'🌊 Kein Platz im Meer！',
+    occupied:'⛔ Bereits besetzt！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} hat die ${cn}-Flagge gepflanzt！`,
+    letsGo:'Los geht es！',
+    holdsLine:(nick)=>`${nick} hält die Stellung…`,
+    timeout:(cn)=>`⏩ ${cn} Zeitüberschreitung！ Nächstes Team`,
+    autoReset:'⏰ 5 Min. keine Aktion — Auto-Reset！',
+    resetDone:'🔄 Zurückgesetzt！ Neues Spiel！',
+    gameBegin:'⚔️ FLAG KINGDOM beginnt！ Erster Zug！',
+    bigCapture:(nick,n)=>`⚡ ${nick} Massenangriff！ ${n} Felder！`,
+    attack:(nick,n)=>`🔥 ${nick} wilder Angriff！ ${n} Felder！`,
+    capture3:(nick,n)=>`🎯 ${nick} erobert ${n} Felder！`,
+    capture1:(nick,n)=>`${nick} nimmt ${n} Felder！`,
+    cheerUp:(cn)=>`🎉 Jubel für ${cn} steigt！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} tritt ${cn} bei！`,
+    joined:(nick)=>`${nick} ist dabei！`,
+    joinedMsg:(cn)=>`${cn} betritt das Schlachtfeld！`,
+    joinedTeam:(cn)=>`Team ${cn} beigetreten！`,
+    nowTurn:'▶ Jetzt',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — Jeder kann spielen！${setup?' — Erster Stein':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}s für ${cn} (${who}) oder überspringen`,
+    errNeedName:'Name eingeben！',
+    errNeedCountry:'Land auswählen oder eingeben',
+    errMax:'Max. 8 Länder',
+    errNeedNameMid:'Name eingeben',
+    errNeedCountryMid:'Land auswählen',
+    errMaxMid:'Max. 8 Länder',
+    errMin:'Mindestens 2 Länder',
+    loadingFlags:'🏳️ Flaggen laden…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} Felder erobert！`,
+    gameOver:'🏆 SPIEL VORBEI！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) gewinnt FLAG KINGDOM！ ${n} Felder！ #FlagKingdom`,
+    shareX:'𝕏 Auf X teilen',
+    shareCopy:'📋 Kopieren',
+    copied:'Kopiert！',
+    resetConfirm:'Spiel zurücksetzen？',
+    supportMsg:'☕ Hat es Spaß gemacht？ Unterstütze den Ersteller！',
+    secRemain:(n,cn,who)=>`⏱ ${n}s — ${cn} (${who}) spielen oder überspringen`,
+  },
+  // Español
+  es:{
+    subtl:'✨ ¡Conquista el mundo con tu bandera！ ✨',
+    joinTitle:'⚔️ Registro (2–8 países)',
+    lblName:'① Tu nombre',
+    lblCountry:'② Selecciona tu país',
+    divOr:'── O escribe el nombre del país ──',
+    nickPh:'ej. Yuka, Tom, Sakura',
+    ctPh:'Grecia, Mali, Japón…',
+    btnJoin:'¡Unirse！🔥',
+    btnStart:'🚀 ¡EMPEZAR！🏰',
+    selPh:'▼ Seleccionar país',
+    cheerTitle:'🎉 Barra de apoyo',
+    midTitle:'⚔️ ¡Unirse en medio del juego！',
+    midLblName:'Nombre',
+    midLblCountry:'País',
+    midNickPh:'Ingresa tu nombre',
+    midJoinBtn:'¡Unirse a este equipo！🔥',
+    midToggle:'➕ Unirse',
+    hint:'💡 Pista',
+    hintOff:'💡 Pista OFF',
+    sndOn:'🔊 Sonido ON',
+    sndOff:'🔇 Sonido OFF',
+    resetBtn:'🔄 Reiniciar',
+    playAgain:'🔄 ¡Jugar de nuevo！',
+    popCells:'Casillas',
+    popJoin:'🔥 ¡Unirse a este equipo！',
+    popClose:'✕ Cerrar',
+    tapClose:'Toca para cerrar',
+    battleReady:'⚔️ ¡Batalla lista！',
+    noSea:'🌊 ¡No se puede colocar en el mar！',
+    occupied:'⛔ ¡Ya ocupado！',
+    plantFlag:(nick,cn)=>`🏳️ ¡${nick} plantó la bandera de ${cn}！`,
+    letsGo:'¡Vamos！',
+    holdsLine:(nick)=>`${nick} mantiene la posición…`,
+    timeout:(cn)=>`⏩ ¡${cn} tiempo agotado！ Siguiente equipo`,
+    autoReset:'⏰ 5 min sin acción — ¡Reinicio auto！',
+    resetDone:'🔄 ¡Reiniciado！ ¡Nueva batalla！',
+    gameBegin:'⚔️ ¡FLAG KINGDOM comienza！ ¡Primer movimiento！',
+    bigCapture:(nick,n)=>`⚡ ¡${nick} captura masiva！ ${n} casillas！`,
+    attack:(nick,n)=>`🔥 ¡Ataque feroz de ${nick}！ ${n} casillas！`,
+    capture3:(nick,n)=>`🎯 ¡${nick} capturó ${n} casillas！`,
+    capture1:(nick,n)=>`¡${nick} tomó ${n} casillas！`,
+    cheerUp:(cn)=>`🎉 ¡Barra de ${cn} sube！`,
+    midJoined:(nick,cn)=>`🔥 ¡${nick} se unió a ${cn}！`,
+    joined:(nick)=>`¡${nick} se unió！`,
+    joinedMsg:(cn)=>`¡${cn} entra al campo de batalla！`,
+    joinedTeam:(cn)=>`¡Unido al equipo ${cn}！`,
+    nowTurn:'▶ Turno',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — ¡Cualquiera puede jugar！${setup?' — Primera pieza':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}s para ${cn} (${who}) o pasar`,
+    errNeedName:'¡Ingresa tu nombre！',
+    errNeedCountry:'Selecciona o escribe un país',
+    errMax:'Máx. 8 países',
+    errNeedNameMid:'Ingresa tu nombre',
+    errNeedCountryMid:'Selecciona un país',
+    errMaxMid:'Máx. 8 países',
+    errMin:'Mínimo 2 países',
+    loadingFlags:'🏳️ Cargando banderas…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ¡${n} casillas conquistadas！`,
+    gameOver:'🏆 ¡FIN DEL JUEGO！',
+    shareText:(nick,cn,n)=>`🏰 ¡${nick} (${cn}) ganó FLAG KINGDOM！ ${n} casillas！ #FlagKingdom`,
+    shareX:'𝕏 Compartir en X',
+    shareCopy:'📋 Copiar',
+    copied:'¡Copiado！',
+    resetConfirm:'¿Reiniciar el juego？',
+    supportMsg:'☕ ¿Te gustó？ ¡Apoya al creador！',
+    secRemain:(n,cn,who)=>`⏱ ${n}s — ${cn} (${who}) jugar o pasar`,
+  },
+  // Português
+  pt:{
+    subtl:'✨ Conquiste o mundo com sua bandeira！ ✨',
+    joinTitle:'⚔️ Registro (2–8 países)',
+    lblName:'① Seu nome',
+    lblCountry:'② Selecione seu país',
+    divOr:'── Ou digite o nome do país ──',
+    nickPh:'ex. Yuka, Tom, Sakura',
+    ctPh:'Grécia, Mali, Japão…',
+    btnJoin:'Participar！🔥',
+    btnStart:'🚀 INICIAR JOGO！🏰',
+    selPh:'▼ Selecione um país',
+    cheerTitle:'🎉 Barra de torcida',
+    midTitle:'⚔️ Entrar no meio do jogo！',
+    midLblName:'Nome',
+    midLblCountry:'País',
+    midNickPh:'Digite seu nome',
+    midJoinBtn:'Entrar neste time！🔥',
+    midToggle:'➕ Entrar',
+    hint:'💡 Dica',
+    hintOff:'💡 Dica OFF',
+    sndOn:'🔊 Som ON',
+    sndOff:'🔇 Som OFF',
+    resetBtn:'🔄 Reiniciar',
+    playAgain:'🔄 Jogar novamente！',
+    popCells:'Casas',
+    popJoin:'🔥 Entrar neste time！',
+    popClose:'✕ Fechar',
+    tapClose:'Toque para fechar',
+    battleReady:'⚔️ Batalha pronta！',
+    noSea:'🌊 Não pode colocar no mar！',
+    occupied:'⛔ Já ocupado！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} plantou a bandeira de ${cn}！`,
+    letsGo:'Vamos！',
+    holdsLine:(nick)=>`${nick} mantém a posição…`,
+    timeout:(cn)=>`⏩ ${cn} tempo esgotado！ Próximo time`,
+    autoReset:'⏰ 5 min sem ação — Reinício auto！',
+    resetDone:'🔄 Reiniciado！ Nova batalha！',
+    gameBegin:'⚔️ FLAG KINGDOM começa！ Primeiro movimento！',
+    bigCapture:(nick,n)=>`⚡ ${nick} captura massiva！ ${n} casas！`,
+    attack:(nick,n)=>`🔥 Ataque feroz de ${nick}！ ${n} casas！`,
+    capture3:(nick,n)=>`🎯 ${nick} capturou ${n} casas！`,
+    capture1:(nick,n)=>`${nick} tomou ${n} casas！`,
+    cheerUp:(cn)=>`🎉 Torcida de ${cn} subiu！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} entrou em ${cn}！`,
+    joined:(nick)=>`${nick} entrou！`,
+    joinedMsg:(cn)=>`${cn} entrou no campo de batalha！`,
+    joinedTeam:(cn)=>`Entrou no time ${cn}！`,
+    nowTurn:'▶ Vez',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — Qualquer um pode jogar！${setup?' — Primeira peça':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}s para ${cn} (${who}) ou pular`,
+    errNeedName:'Digite seu nome！',
+    errNeedCountry:'Selecione ou digite um país',
+    errMax:'Máx. 8 países',
+    errNeedNameMid:'Digite seu nome',
+    errNeedCountryMid:'Selecione um país',
+    errMaxMid:'Máx. 8 países',
+    errMin:'Mínimo 2 países',
+    loadingFlags:'🏳️ Carregando bandeiras…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} casas conquistadas！`,
+    gameOver:'🏆 FIM DE JOGO！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) venceu FLAG KINGDOM！ ${n} casas！ #FlagKingdom`,
+    shareX:'𝕏 Compartilhar no X',
+    shareCopy:'📋 Copiar',
+    copied:'Copiado！',
+    resetConfirm:'Reiniciar o jogo？',
+    supportMsg:'☕ Gostou？ Apoie o criador！',
+    secRemain:(n,cn,who)=>`⏱ ${n}s — ${cn} (${who}) jogar ou pular`,
+  },
+  // 中文
+  zh:{
+    subtl:'✨ 用你的国旗征服世界！ ✨',
+    joinTitle:'⚔️ 参赛登记（2–8国）',
+    lblName:'① 输入你的名字',
+    lblCountry:'② 选择你的国家',
+    divOr:'── 或直接输入国家名称 ──',
+    nickPh:'例：勇者、汤姆',
+    ctPh:'希腊、马里、日本…',
+    btnJoin:'参战！🔥',
+    btnStart:'🚀 游戏开始！🏰',
+    selPh:'▼ 请选择国家',
+    cheerTitle:'🎉 应援槽',
+    midTitle:'⚔️ 中途参战！（游戏继续）',
+    midLblName:'姓名',
+    midLblCountry:'选择国家',
+    midNickPh:'输入名字',
+    midJoinBtn:'加入本队！🔥',
+    midToggle:'➕ 中途参战',
+    hint:'💡 提示',
+    hintOff:'💡 提示 关',
+    sndOn:'🔊 音效 开',
+    sndOff:'🔇 音效 关',
+    resetBtn:'🔄 重置',
+    playAgain:'🔄 再玩一次！',
+    popCells:'格数',
+    popJoin:'🔥 加入本队！',
+    popClose:'✕ 关闭',
+    tapClose:'点击关闭',
+    battleReady:'⚔️ 战场准备就绪！',
+    noSea:'🌊 不能放在海洋上！',
+    occupied:'⛔ 已被占领！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick}为${cn}插上旗帜！`,
+    letsGo:'正式开始！',
+    holdsLine:(nick)=>`${nick}巩固阵地…`,
+    timeout:(cn)=>`⏩ ${cn}超时！下一队`,
+    autoReset:'⏰ 5分钟无操作 — 自动重置！',
+    resetDone:'🔄 重置！新战役开始！',
+    gameBegin:'⚔️ FLAG KINGDOM 开幕！请走第一步！',
+    bigCapture:(nick,n)=>`⚡ ${nick}大量夺取！${n}格！`,
+    attack:(nick,n)=>`🔥 ${nick}猛攻！${n}格制压！`,
+    capture3:(nick,n)=>`🎯 ${nick}夺取${n}格！`,
+    capture1:(nick,n)=>`${nick}夺取了${n}格！`,
+    cheerUp:(cn)=>`🎉 ${cn}的应援槽上升！`,
+    midJoined:(nick,cn)=>`🔥 ${nick}加入${cn}！`,
+    joined:(nick)=>`${nick}参战！`,
+    joinedMsg:(cn)=>`${cn}进入战场！`,
+    joinedTeam:(cn)=>`加入${cn}队！`,
+    nowTurn:'▶ 当前',
+    turnMsg:(cn,who,setup)=>`${cn}（${who}）的回合！任何人都可以下${setup?' — 初始放置':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}秒内${cn}（${who}）未落子则跳过`,
+    errNeedName:'请输入名字！',
+    errNeedCountry:'请选择或输入国家',
+    errMax:'最多8个国家',
+    errNeedNameMid:'请输入名字',
+    errNeedCountryMid:'请选择国家',
+    errMaxMid:'最多8个国家',
+    errMin:'至少需要2个国家',
+    loadingFlags:'🏳️ 加载国旗中…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · 征服${n}格！`,
+    gameOver:'🏆 游戏结束！',
+    shareText:(nick,cn,n)=>`🏰 ${nick}（${cn}）赢得FLAG KINGDOM！征服${n}格！ #FlagKingdom`,
+    shareX:'𝕏 分享到X',
+    shareCopy:'📋 复制',
+    copied:'已复制！',
+    resetConfirm:'重置游戏？',
+    supportMsg:'☕ 喜欢这个游戏？支持创作者！',
+    secRemain:(n,cn,who)=>`⏱ ${n}秒 — ${cn}（${who}）落子或跳过`,
+  },
+  // 한국어
+  ko:{
+    subtl:'✨ 국기로 세계를 정복하라！ ✨',
+    joinTitle:'⚔️ 참가 등록 (2–8개국)',
+    lblName:'① 이름 입력',
+    lblCountry:'② 국가 선택',
+    divOr:'── 또는 국가명 직접 입력 ──',
+    nickPh:'예: 유카, 톰, 사쿠라',
+    ctPh:'그리스, 말리, 일본…',
+    btnJoin:'참전！🔥',
+    btnStart:'🚀 게임 시작！🏰',
+    selPh:'▼ 국가를 선택하세요',
+    cheerTitle:'🎉 응원 게이지',
+    midTitle:'⚔️ 중도 참전！ (게임 계속)',
+    midLblName:'이름',
+    midLblCountry:'국가 선택',
+    midNickPh:'이름 입력',
+    midJoinBtn:'이 팀에 참전！🔥',
+    midToggle:'➕ 중도 참전',
+    hint:'💡 힌트',
+    hintOff:'💡 힌트 OFF',
+    sndOn:'🔊 사운드 ON',
+    sndOff:'🔇 사운드 OFF',
+    resetBtn:'🔄 리셋',
+    playAgain:'🔄 다시 플레이！',
+    popCells:'칸수',
+    popJoin:'🔥 이 팀에 참전！',
+    popClose:'✕ 닫기',
+    tapClose:'탭하여 닫기',
+    battleReady:'⚔️ 전장 준비 완료！',
+    noSea:'🌊 바다에는 놓을 수 없습니다！',
+    occupied:'⛔ 이미 점령됨！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick}이/가 ${cn} 깃발을 꽂았습니다！`,
+    letsGo:'이제 본격적으로！',
+    holdsLine:(nick)=>`${nick}이/가 진지를 굳힙니다…`,
+    timeout:(cn)=>`⏩ ${cn} 타임아웃！ 다음 팀으로`,
+    autoReset:'⏰ 5분 무작동 — 자동 리셋！',
+    resetDone:'🔄 리셋！ 새로운 전투 시작！',
+    gameBegin:'⚔️ FLAG KINGDOM 개막！ 첫 수를 놓으세요！',
+    bigCapture:(nick,n)=>`⚡ ${nick}이/가 ${n}칸 대량 점령！！`,
+    attack:(nick,n)=>`🔥 ${nick}의 맹공！ ${n}칸 제압！`,
+    capture3:(nick,n)=>`🎯 ${nick}이/가 ${n}칸 점령！`,
+    capture1:(nick,n)=>`${nick}이/가 ${n}칸을 빼앗았습니다！`,
+    cheerUp:(cn)=>`🎉 ${cn}의 응원 게이지 상승！`,
+    midJoined:(nick,cn)=>`🔥 ${nick}이/가 ${cn}에 중도 참전！`,
+    joined:(nick)=>`${nick}이/가 참전！`,
+    joinedMsg:(cn)=>`${cn}이/가 전장에 내려섰습니다！`,
+    joinedTeam:(cn)=>`${cn} 팀에 합류！`,
+    nowTurn:'▶ 현재 차례',
+    turnMsg:(cn,who,setup)=>`${cn}（${who}）의 차례！ 누구든 놓을 수 있습니다${setup?' — 초기 배치':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}초 내에 ${cn}（${who}）이/가 놓지 않으면 스킵`,
+    errNeedName:'이름을 입력하세요！',
+    errNeedCountry:'국가를 선택하거나 입력하세요',
+    errMax:'최대 8개국',
+    errNeedNameMid:'이름을 입력하세요',
+    errNeedCountryMid:'국가를 선택하세요',
+    errMaxMid:'최대 8개국',
+    errMin:'2개국 이상 필요',
+    loadingFlags:'🏳️ 국기 로딩 중…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n}칸 정복！`,
+    gameOver:'🏆 게임 종료！',
+    shareText:(nick,cn,n)=>`🏰 ${nick}（${cn}）이/가 FLAG KINGDOM 우승！ ${n}칸 정복！ #FlagKingdom`,
+    shareX:'𝕏 X에 공유',
+    shareCopy:'📋 복사',
+    copied:'복사됨！',
+    resetConfirm:'게임을 리셋하시겠습니까？',
+    supportMsg:'☕ 재밌었나요？ 제작자를 응원해 주세요！',
+    secRemain:(n,cn,who)=>`⏱ ${n}초 — ${cn}（${who}）놓거나 스킵`,
+  },
+  // हिन्दी
+  hi:{
+    subtl:'✨ अपने झंडे से दुनिया जीतो！ ✨',
+    joinTitle:'⚔️ पंजीकरण (2–8 देश)',
+    lblName:'① अपना नाम दर्ज करें',
+    lblCountry:'② अपना देश चुनें',
+    divOr:'── या देश का नाम टाइप करें ──',
+    nickPh:'उदा. युका, टॉम',
+    ctPh:'ग्रीस, माली, जापान…',
+    btnJoin:'शामिल हों！🔥',
+    btnStart:'🚀 खेल शुरू！🏰',
+    selPh:'▼ देश चुनें',
+    cheerTitle:'🎉 चीयर गेज',
+    midTitle:'⚔️ बीच में शामिल हों！',
+    midLblName:'नाम',
+    midLblCountry:'देश चुनें',
+    midNickPh:'नाम दर्ज करें',
+    midJoinBtn:'इस टीम में शामिल！🔥',
+    midToggle:'➕ शामिल हों',
+    hint:'💡 संकेत',
+    hintOff:'💡 संकेत बंद',
+    sndOn:'🔊 ध्वनि चालू',
+    sndOff:'🔇 ध्वनि बंद',
+    resetBtn:'🔄 रीसेट',
+    playAgain:'🔄 फिर खेलें！',
+    popCells:'सेल',
+    popJoin:'🔥 इस टीम में शामिल！',
+    popClose:'✕ बंद करें',
+    tapClose:'बंद करने के लिए टैप करें',
+    battleReady:'⚔️ युद्धक्षेत्र तैयार！',
+    noSea:'🌊 समुद्र पर नहीं रख सकते！',
+    occupied:'⛔ पहले से कब्जा！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} ने ${cn} का झंडा लगाया！`,
+    letsGo:'चलो शुरू！',
+    holdsLine:(nick)=>`${nick} मोर्चा थामे है…`,
+    timeout:(cn)=>`⏩ ${cn} का समय खत्म！ अगली टीम`,
+    autoReset:'⏰ 5 मिनट बिना कार्रवाई — स्वतः रीसेट！',
+    resetDone:'🔄 रीसेट！ नई लड़ाई！',
+    gameBegin:'⚔️ FLAG KINGDOM शुरू！ पहला कदम！',
+    bigCapture:(nick,n)=>`⚡ ${nick} ने ${n} सेल जीते！`,
+    attack:(nick,n)=>`🔥 ${nick} का हमला！ ${n} सेल！`,
+    capture3:(nick,n)=>`🎯 ${nick} ने ${n} सेल कब्जाए！`,
+    capture1:(nick,n)=>`${nick} ने ${n} सेल लिए！`,
+    cheerUp:(cn)=>`🎉 ${cn} का चीयर बढ़ा！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} ने ${cn} जॉइन किया！`,
+    joined:(nick)=>`${nick} शामिल！`,
+    joinedMsg:(cn)=>`${cn} मैदान में！`,
+    joinedTeam:(cn)=>`${cn} टीम में शामिल！`,
+    nowTurn:'▶ अभी',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — कोई भी खेल सकता है！${setup?' — पहला टुकड़ा':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}s में ${cn} (${who}) रखें या छोड़ें`,
+    errNeedName:'नाम दर्ज करें！',
+    errNeedCountry:'देश चुनें या टाइप करें',
+    errMax:'अधिकतम 8 देश',
+    errNeedNameMid:'नाम दर्ज करें',
+    errNeedCountryMid:'देश चुनें',
+    errMaxMid:'अधिकतम 8 देश',
+    errMin:'कम से कम 2 देश',
+    loadingFlags:'🏳️ झंडे लोड हो रहे हैं…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} सेल जीते！`,
+    gameOver:'🏆 खेल समाप्त！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) ने FLAG KINGDOM जीता！ ${n} सेल！ #FlagKingdom`,
+    shareX:'𝕏 X पर शेयर',
+    shareCopy:'📋 कॉपी',
+    copied:'कॉपी हुआ！',
+    resetConfirm:'खेल रीसेट करें？',
+    supportMsg:'☕ मज़ा आया？ निर्माता को सपोर्ट करें！',
+    secRemain:(n,cn,who)=>`⏱ ${n}s — ${cn} (${who}) रखें या छोड़ें`,
+  },
+  // العربية
+  ar:{
+    subtl:'✨ اغزُ العالم بعلمك！ ✨',
+    joinTitle:'⚔️ التسجيل (2–8 دول)',
+    lblName:'① أدخل اسمك',
+    lblCountry:'② اختر بلدك',
+    divOr:'── أو اكتب اسم الدولة ──',
+    nickPh:'مثال: يوكا، توم',
+    ctPh:'اليونان، مالي…',
+    btnJoin:'انضم！🔥',
+    btnStart:'🚀 ابدأ اللعبة！🏰',
+    selPh:'▼ اختر دولة',
+    cheerTitle:'🎉 شريط التشجيع',
+    midTitle:'⚔️ الانضمام في منتصف اللعبة！',
+    midLblName:'الاسم',
+    midLblCountry:'اختر دولة',
+    midNickPh:'أدخل الاسم',
+    midJoinBtn:'انضم لهذا الفريق！🔥',
+    midToggle:'➕ انضمام',
+    hint:'💡 تلميح',
+    hintOff:'💡 تلميح إيقاف',
+    sndOn:'🔊 الصوت شغّال',
+    sndOff:'🔇 الصوت مطفأ',
+    resetBtn:'🔄 إعادة تعيين',
+    playAgain:'🔄 العب مجدداً！',
+    popCells:'خلايا',
+    popJoin:'🔥 انضم لهذا الفريق！',
+    popClose:'✕ إغلاق',
+    tapClose:'اضغط للإغلاق',
+    battleReady:'⚔️ الميدان جاهز！',
+    noSea:'🌊 لا يمكن الوضع في البحر！',
+    occupied:'⛔ محتلة بالفعل！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} زرع علم ${cn}！`,
+    letsGo:'هيا！',
+    holdsLine:(nick)=>`${nick} يثبّت مواقعه…`,
+    timeout:(cn)=>`⏩ انتهى وقت ${cn}！ الفريق التالي`,
+    autoReset:'⏰ 5 دقائق بلا تحرك — إعادة تعيين تلقائية！',
+    resetDone:'🔄 إعادة تعيين！ معركة جديدة！',
+    gameBegin:'⚔️ FLAG KINGDOM يبدأ！ أول خطوة！',
+    bigCapture:(nick,n)=>`⚡ ${nick} استولى على ${n} خلايا！`,
+    attack:(nick,n)=>`🔥 هجوم شرس من ${nick}！ ${n} خلايا！`,
+    capture3:(nick,n)=>`🎯 ${nick} استولى على ${n} خلايا！`,
+    capture1:(nick,n)=>`${nick} أخذ ${n} خلايا！`,
+    cheerUp:(cn)=>`🎉 شريط تشجيع ${cn} يرتفع！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} انضم إلى ${cn}！`,
+    joined:(nick)=>`${nick} انضم！`,
+    joinedMsg:(cn)=>`${cn} دخل الميدان！`,
+    joinedTeam:(cn)=>`انضم لفريق ${cn}！`,
+    nowTurn:'▶ الدور',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — أي شخص يمكنه اللعب！${setup?' — أول قطعة':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}ث لـ ${cn} (${who}) أو تخطي`,
+    errNeedName:'أدخل اسمك！',
+    errNeedCountry:'اختر أو اكتب دولة',
+    errMax:'بحد أقصى 8 دول',
+    errNeedNameMid:'أدخل اسمك',
+    errNeedCountryMid:'اختر دولة',
+    errMaxMid:'بحد أقصى 8 دول',
+    errMin:'دولتان على الأقل',
+    loadingFlags:'🏳️ تحميل الأعلام…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} خلية مفتوحة！`,
+    gameOver:'🏆 انتهت اللعبة！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) فاز في FLAG KINGDOM！ ${n} خلية！ #FlagKingdom`,
+    shareX:'𝕏 مشاركة على X',
+    shareCopy:'📋 نسخ',
+    copied:'تم النسخ！',
+    resetConfirm:'إعادة تعيين اللعبة？',
+    supportMsg:'☕ استمتعت؟ ادعم المبدع！',
+    secRemain:(n,cn,who)=>`⏱ ${n}ث — ${cn} (${who}) العب أو تخطَّ`,
+  },
+  // Русский
+  ru:{
+    subtl:'✨ Завоюй мир своим флагом！ ✨',
+    joinTitle:'⚔️ Регистрация (2–8 стран)',
+    lblName:'① Введите имя',
+    lblCountry:'② Выберите страну',
+    divOr:'── Или введите название страны ──',
+    nickPh:'напр. Юка, Том',
+    ctPh:'Греция, Мали, Япония…',
+    btnJoin:'Участвовать！🔥',
+    btnStart:'🚀 НАЧАТЬ ИГРУ！🏰',
+    selPh:'▼ Выберите страну',
+    cheerTitle:'🎉 Шкала поддержки',
+    midTitle:'⚔️ Присоединиться в середине！',
+    midLblName:'Имя',
+    midLblCountry:'Выбор страны',
+    midNickPh:'Введите имя',
+    midJoinBtn:'Присоединиться！🔥',
+    midToggle:'➕ Войти',
+    hint:'💡 Подсказка',
+    hintOff:'💡 Подсказка ВЫКЛ',
+    sndOn:'🔊 Звук ВКЛ',
+    sndOff:'🔇 Звук ВЫКЛ',
+    resetBtn:'🔄 Сброс',
+    playAgain:'🔄 Играть снова！',
+    popCells:'Клетки',
+    popJoin:'🔥 Присоединиться！',
+    popClose:'✕ Закрыть',
+    tapClose:'Нажмите, чтобы закрыть',
+    battleReady:'⚔️ Поле боя готово！',
+    noSea:'🌊 Нельзя ставить на море！',
+    occupied:'⛔ Уже занято！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} поставил флаг ${cn}！`,
+    letsGo:'Поехали！',
+    holdsLine:(nick)=>`${nick} удерживает позицию…`,
+    timeout:(cn)=>`⏩ ${cn} — время вышло！ Следующая команда`,
+    autoReset:'⏰ 5 мин без действий — Авто сброс！',
+    resetDone:'🔄 Сброс！ Новая битва！',
+    gameBegin:'⚔️ FLAG KINGDOM начинается！ Первый ход！',
+    bigCapture:(nick,n)=>`⚡ ${nick} захватил ${n} клеток！`,
+    attack:(nick,n)=>`🔥 Натиск ${nick}！ ${n} клеток！`,
+    capture3:(nick,n)=>`🎯 ${nick} захватил ${n} клетки！`,
+    capture1:(nick,n)=>`${nick} взял ${n} клетку！`,
+    cheerUp:(cn)=>`🎉 Поддержка ${cn} растёт！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} вошёл в ${cn}！`,
+    joined:(nick)=>`${nick} присоединился！`,
+    joinedMsg:(cn)=>`${cn} вышел на поле！`,
+    joinedTeam:(cn)=>`Присоединился к команде ${cn}！`,
+    nowTurn:'▶ Сейчас',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — Любой может сыграть！${setup?' — Первый камень':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}с для ${cn} (${who}) или пропуск`,
+    errNeedName:'Введите имя！',
+    errNeedCountry:'Выберите или введите страну',
+    errMax:'Макс. 8 стран',
+    errNeedNameMid:'Введите имя',
+    errNeedCountryMid:'Выберите страну',
+    errMaxMid:'Макс. 8 стран',
+    errMin:'Нужно минимум 2 страны',
+    loadingFlags:'🏳️ Загрузка флагов…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} клеток завоёвано！`,
+    gameOver:'🏆 КОНЕЦ ИГРЫ！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) победил в FLAG KINGDOM！ ${n} клеток！ #FlagKingdom`,
+    shareX:'𝕏 Поделиться на X',
+    shareCopy:'📋 Скопировать',
+    copied:'Скопировано！',
+    resetConfirm:'Сбросить игру？',
+    supportMsg:'☕ Понравилось？ Поддержи создателя！',
+    secRemain:(n,cn,who)=>`⏱ ${n}с — ${cn} (${who}) играй или пропусти`,
+  },
+  // Türkçe
+  tr:{
+    subtl:'✨ Bayrağınla dünyayı fethет！ ✨',
+    joinTitle:'⚔️ Kayıt (2–8 ülke)',
+    lblName:'① Adınızı girin',
+    lblCountry:'② Ülkenizi seçin',
+    divOr:'── Ya da ülke adını yazın ──',
+    nickPh:'örn. Yuka, Tom',
+    ctPh:'Yunanistan, Mali…',
+    btnJoin:'Katıl！🔥',
+    btnStart:'🚀 OYUNA BAŞLA！🏰',
+    selPh:'▼ Ülke seçin',
+    cheerTitle:'🎉 Tezahürat çubuğu',
+    midTitle:'⚔️ Oyun ortasında katıl！',
+    midLblName:'İsim',
+    midLblCountry:'Ülke seç',
+    midNickPh:'İsim girin',
+    midJoinBtn:'Bu takıma katıl！🔥',
+    midToggle:'➕ Katıl',
+    hint:'💡 İpucu',
+    hintOff:'💡 İpucu KAPALI',
+    sndOn:'🔊 Ses AÇIK',
+    sndOff:'🔇 Ses KAPALI',
+    resetBtn:'🔄 Sıfırla',
+    playAgain:'🔄 Tekrar oyna！',
+    popCells:'Hücreler',
+    popJoin:'🔥 Bu takıma katıl！',
+    popClose:'✕ Kapat',
+    tapClose:'Kapatmak için dokun',
+    battleReady:'⚔️ Savaş alanı hazır！',
+    noSea:'🌊 Denize yerleştiremezsiniz！',
+    occupied:'⛔ Zaten işgal altında！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} ${cn} bayrağını dikti！`,
+    letsGo:'Hadi başlayalım！',
+    holdsLine:(nick)=>`${nick} mevziyi tutuyor…`,
+    timeout:(cn)=>`⏩ ${cn} zaman aşımı！ Sonraki takım`,
+    autoReset:'⏰ 5 dk hareketsizlik — Otomatik sıfırlama！',
+    resetDone:'🔄 Sıfırlandı！ Yeni savaş！',
+    gameBegin:'⚔️ FLAG KINGDOM başlıyor！ İlk hamle！',
+    bigCapture:(nick,n)=>`⚡ ${nick} toplu ele geçirdi！ ${n} hücre！`,
+    attack:(nick,n)=>`🔥 ${nick} şiddetli saldırı！ ${n} hücre！`,
+    capture3:(nick,n)=>`🎯 ${nick} ${n} hücre ele geçirdi！`,
+    capture1:(nick,n)=>`${nick} ${n} hücre aldı！`,
+    cheerUp:(cn)=>`🎉 ${cn} tezahürat çubuğu yükseliyor！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} ${cn} takımına katıldı！`,
+    joined:(nick)=>`${nick} katıldı！`,
+    joinedMsg:(cn)=>`${cn} savaş alanına girdi！`,
+    joinedTeam:(cn)=>`${cn} takımına katıldı！`,
+    nowTurn:'▶ Şimdi',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — Herkes oynayabilir！${setup?' — İlk taş':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}s ${cn} (${who}) için veya atla`,
+    errNeedName:'Adınızı girin！',
+    errNeedCountry:'Ülke seçin veya yazın',
+    errMax:'Maks. 8 ülke',
+    errNeedNameMid:'Adınızı girin',
+    errNeedCountryMid:'Ülke seçin',
+    errMaxMid:'Maks. 8 ülke',
+    errMin:'En az 2 ülke gerekli',
+    loadingFlags:'🏳️ Bayraklar yükleniyor…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} hücre fethedildi！`,
+    gameOver:'🏆 OYUN BİTTİ！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) FLAG KINGDOM'u kazandı！ ${n} hücre！ #FlagKingdom`,
+    shareX:'𝕏 X\'te paylaş',
+    shareCopy:'📋 Kopyala',
+    copied:'Kopyalandı！',
+    resetConfirm:'Oyunu sıfırla？',
+    supportMsg:'☕ Keyif aldınız mı？ Yaratıcıyı destekleyin！',
+    secRemain:(n,cn,who)=>`⏱ ${n}s — ${cn} (${who}) oyna veya atla`,
+  },
+  // Bahasa Indonesia
+  id:{
+    subtl:'✨ Taklukkan dunia dengan benderamu！ ✨',
+    joinTitle:'⚔️ Daftar (2–8 negara)',
+    lblName:'① Masukkan namamu',
+    lblCountry:'② Pilih negaramu',
+    divOr:'── Atau ketik nama negara ──',
+    nickPh:'mis. Yuka, Tom',
+    ctPh:'Yunani, Mali, Jepang…',
+    btnJoin:'Bergabung！🔥',
+    btnStart:'🚀 MULAI GAME！🏰',
+    selPh:'▼ Pilih negara',
+    cheerTitle:'🎉 Gauge Dukungan',
+    midTitle:'⚔️ Bergabung di tengah game！',
+    midLblName:'Nama',
+    midLblCountry:'Pilih negara',
+    midNickPh:'Masukkan nama',
+    midJoinBtn:'Bergabung tim ini！🔥',
+    midToggle:'➕ Bergabung',
+    hint:'💡 Petunjuk',
+    hintOff:'💡 Petunjuk OFF',
+    sndOn:'🔊 Suara ON',
+    sndOff:'🔇 Suara OFF',
+    resetBtn:'🔄 Ulang',
+    playAgain:'🔄 Main lagi！',
+    popCells:'Kotak',
+    popJoin:'🔥 Bergabung tim ini！',
+    popClose:'✕ Tutup',
+    tapClose:'Ketuk untuk menutup',
+    battleReady:'⚔️ Medan perang siap！',
+    noSea:'🌊 Tidak bisa di laut！',
+    occupied:'⛔ Sudah ditempati！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} menancapkan bendera ${cn}！`,
+    letsGo:'Ayo mulai！',
+    holdsLine:(nick)=>`${nick} bertahan…`,
+    timeout:(cn)=>`⏩ ${cn} waktu habis！ Tim berikutnya`,
+    autoReset:'⏰ 5 menit tanpa aksi — Reset otomatis！',
+    resetDone:'🔄 Ulang！ Pertempuran baru！',
+    gameBegin:'⚔️ FLAG KINGDOM dimulai！ Langkah pertama！',
+    bigCapture:(nick,n)=>`⚡ ${nick} tangkapan massal！ ${n} kotak！`,
+    attack:(nick,n)=>`🔥 Serangan dahsyat ${nick}！ ${n} kotak！`,
+    capture3:(nick,n)=>`🎯 ${nick} merebut ${n} kotak！`,
+    capture1:(nick,n)=>`${nick} mengambil ${n} kotak！`,
+    cheerUp:(cn)=>`🎉 Gauge dukungan ${cn} naik！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} bergabung ${cn}！`,
+    joined:(nick)=>`${nick} bergabung！`,
+    joinedMsg:(cn)=>`${cn} memasuki medan perang！`,
+    joinedTeam:(cn)=>`Bergabung tim ${cn}！`,
+    nowTurn:'▶ Giliran',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — Siapapun bisa bermain！${setup?' — Batu pertama':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}d untuk ${cn} (${who}) atau lewati`,
+    errNeedName:'Masukkan namamu！',
+    errNeedCountry:'Pilih atau ketik negara',
+    errMax:'Maks. 8 negara',
+    errNeedNameMid:'Masukkan nama',
+    errNeedCountryMid:'Pilih negara',
+    errMaxMid:'Maks. 8 negara',
+    errMin:'Minimal 2 negara',
+    loadingFlags:'🏳️ Memuat bendera…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} kotak ditaklukkan！`,
+    gameOver:'🏆 GAME SELESAI！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) menang FLAG KINGDOM！ ${n} kotak！ #FlagKingdom`,
+    shareX:'𝕏 Bagikan di X',
+    shareCopy:'📋 Salin',
+    copied:'Disalin！',
+    resetConfirm:'Ulang game？',
+    supportMsg:'☕ Seru kan？ Dukung kreatornya！',
+    secRemain:(n,cn,who)=>`⏱ ${n}d — ${cn} (${who}) main atau lewati`,
+  },
+  // ภาษาไทย
+  th:{
+    subtl:'✨ พิชิตโลกด้วยธงของคุณ！ ✨',
+    joinTitle:'⚔️ ลงทะเบียน (2–8 ประเทศ)',
+    lblName:'① ใส่ชื่อของคุณ',
+    lblCountry:'② เลือกประเทศของคุณ',
+    divOr:'── หรือพิมพ์ชื่อประเทศ ──',
+    nickPh:'เช่น ยูกะ, ทอม',
+    ctPh:'กรีซ, มาลี, ญี่ปุ่น…',
+    btnJoin:'เข้าร่วม！🔥',
+    btnStart:'🚀 เริ่มเกม！🏰',
+    selPh:'▼ เลือกประเทศ',
+    cheerTitle:'🎉 มาตรวัดการเชียร์',
+    midTitle:'⚔️ เข้าร่วมกลางเกม！',
+    midLblName:'ชื่อ',
+    midLblCountry:'เลือกประเทศ',
+    midNickPh:'ใส่ชื่อ',
+    midJoinBtn:'เข้าร่วมทีมนี้！🔥',
+    midToggle:'➕ เข้าร่วม',
+    hint:'💡 คำใบ้',
+    hintOff:'💡 คำใบ้ ปิด',
+    sndOn:'🔊 เสียง เปิด',
+    sndOff:'🔇 เสียง ปิด',
+    resetBtn:'🔄 รีเซ็ต',
+    playAgain:'🔄 เล่นอีกครั้ง！',
+    popCells:'ช่อง',
+    popJoin:'🔥 เข้าร่วมทีมนี้！',
+    popClose:'✕ ปิด',
+    tapClose:'แตะเพื่อปิด',
+    battleReady:'⚔️ สนามรบพร้อมแล้ว！',
+    noSea:'🌊 ไม่สามารถวางบนทะเลได้！',
+    occupied:'⛔ ถูกยึดครองแล้ว！',
+    plantFlag:(nick,cn)=>`🏳️ ${nick} ปักธง ${cn} แล้ว！`,
+    letsGo:'เริ่มเลย！',
+    holdsLine:(nick)=>`${nick} รักษาแนว…`,
+    timeout:(cn)=>`⏩ ${cn} หมดเวลา！ ทีมถัดไป`,
+    autoReset:'⏰ 5 นาทีไม่มีการกระทำ — รีเซ็ตอัตโนมัติ！',
+    resetDone:'🔄 รีเซ็ต！ การต่อสู้ใหม่！',
+    gameBegin:'⚔️ FLAG KINGDOM เริ่มต้น！ การเคลื่อนไหวแรก！',
+    bigCapture:(nick,n)=>`⚡ ${nick} ยึดครองจำนวนมาก！ ${n} ช่อง！`,
+    attack:(nick,n)=>`🔥 การโจมตีดุเดือดของ ${nick}！ ${n} ช่อง！`,
+    capture3:(nick,n)=>`🎯 ${nick} ยึด ${n} ช่อง！`,
+    capture1:(nick,n)=>`${nick} ยึด ${n} ช่อง！`,
+    cheerUp:(cn)=>`🎉 มาตรวัดเชียร์ ${cn} เพิ่มขึ้น！`,
+    midJoined:(nick,cn)=>`🔥 ${nick} เข้าร่วม ${cn}！`,
+    joined:(nick)=>`${nick} เข้าร่วม！`,
+    joinedMsg:(cn)=>`${cn} เข้าสู่สนามรบ！`,
+    joinedTeam:(cn)=>`เข้าร่วมทีม ${cn}！`,
+    nowTurn:'▶ ตอนนี้',
+    turnMsg:(cn,who,setup)=>`${cn} (${who}) — ใครก็เล่นได้！${setup?' — ชิ้นแรก':''}`,
+    skipMsg:(n,cn,who)=>`⏱ ${n}วิ สำหรับ ${cn} (${who}) หรือข้าม`,
+    errNeedName:'ใส่ชื่อของคุณ！',
+    errNeedCountry:'เลือกหรือพิมพ์ประเทศ',
+    errMax:'สูงสุด 8 ประเทศ',
+    errNeedNameMid:'ใส่ชื่อ',
+    errNeedCountryMid:'เลือกประเทศ',
+    errMaxMid:'สูงสุด 8 ประเทศ',
+    errMin:'ต้องการ 2 ประเทศขึ้นไป',
+    loadingFlags:'🏳️ กำลังโหลดธง…',
+    mvpLabel:'👑 MVP',
+    mvpSub:(cn,n)=>`${cn} · ${n} ช่องถูกพิชิต！`,
+    gameOver:'🏆 เกมจบแล้ว！',
+    shareText:(nick,cn,n)=>`🏰 ${nick} (${cn}) ชนะ FLAG KINGDOM！ ${n} ช่อง！ #FlagKingdom`,
+    shareX:'𝕏 แชร์บน X',
+    shareCopy:'📋 คัดลอก',
+    copied:'คัดลอกแล้ว！',
+    resetConfirm:'รีเซ็ตเกม？',
+    supportMsg:'☕ สนุกไหม？ สนับสนุนผู้สร้าง！',
+    secRemain:(n,cn,who)=>`⏱ ${n}วิ — ${cn} (${who}) เล่นหรือข้าม`,
+  },
+};
+
+// 言語コードマッピング（国コード→言語コード）
+const COUNTRY_LANG = {
+  jp:'ja', us:'en', gb:'en', au:'en', ca:'en', nz:'en', ie:'en',
+  fr:'fr', be:'fr', ch:'fr', mc:'fr', sn:'fr', ci:'fr', ml:'fr', bf:'fr',
+  de:'de', at:'de', ch_de:'de',
+  es:'es', mx:'es', ar:'es', cl:'es', co:'es', pe:'es', ve:'es', cu:'es',
+  br:'pt', pt:'pt', ao:'pt', mz:'pt',
+  cn:'zh', tw:'zh', hk:'zh', sg:'zh',
+  kr:'ko', kp:'ko',
+  in:'hi', np:'hi',
+  sa:'ar', ae:'ar', iq:'ar', sy:'ar', jo:'ar', lb:'ar', eg:'ar', ma:'ar', dz:'ar', tn:'ar', ly:'ar',
+  ru:'ru', by:'ru', kz:'ru',
+  tr:'tr', az:'tr',
+  id:'id', my:'id',
+  th:'th',
+  vn:'en', ph:'en', mm:'en', kh:'en', la:'en',
+  pl:'en', ua:'en', gr:'en', hu:'en', cz:'en', ro:'en', bg:'en',
+  se:'en', no:'en', dk:'en', fi:'en', nl:'en',
+  it:'en', lk:'en', pk:'en', bd:'en', ir:'en', mn:'en',
+  za:'en', ng:'en', ke:'en', et:'en', gh:'en', tz:'en',
+  il:'en', qa:'en', kw:'en', mn:'en', la:'en',
+};
+
+// 国の自国語名
+const NATIVE_NAMES = {
+  jp:'日本', us:'United States', cn:'中国', ru:'Россия', gb:'United Kingdom',
+  fr:'France', de:'Deutschland', it:'Italia', es:'España', kr:'한국',
+  in:'भारत', br:'Brasil', ca:'Canada', au:'Australia', mx:'México',
+  ar:'Argentina', tr:'Türkiye', th:'ไทย', id:'Indonesia', vn:'Việt Nam',
+  ph:'Philippines', my:'Malaysia', sg:'Singapore', tw:'台灣', nl:'Nederland',
+  be:'België', ch:'Schweiz', at:'Österreich', se:'Sverige', no:'Norge',
+  dk:'Danmark', fi:'Suomi', pl:'Polska', ua:'Україна', gr:'Ελλάδα',
+  pt:'Portugal', hu:'Magyarország', cz:'Česko', ro:'România', ie:'Ireland',
+  za:'South Africa', eg:'مصر', ng:'Nigeria', ke:'Kenya', et:'Ethiopia',
+  gh:'Ghana', ml:'Mali', ma:'المغرب', sa:'السعودية', ae:'الإمارات',
+  ir:'ایران', pk:'Pakistan', bd:'বাংলাদেশ', cl:'Chile', co:'Colombia',
+  pe:'Perú', ve:'Venezuela', nz:'New Zealand', kp:'조선', mm:'မြန်မာ',
+  kh:'កម្ពុជា', qa:'قطر', cu:'Cuba', mn:'Монгол', iq:'العراق',
+  la:'ລາວ', lk:'ශ්‍රී ලංකා', np:'नेपाल', tz:'Tanzania', il:'ישראל',
+  hk:'香港',
+};
+
+// 現在の言語
+let currentLang = 'en';
+
+// 言語辞書取得（フォールバック: en）
+function T(key, ...args) {
+  const d = LANG_DICT[currentLang] || LANG_DICT['en'];
+  const v = d[key] !== undefined ? d[key] : (LANG_DICT['en'][key] || key);
+  if (typeof v === 'function') return v(...args);
+  return v;
+}
+
+// UI全体を現在の言語で更新
+function applyLang() {
+  const d = LANG_DICT[currentLang] || LANG_DICT['en'];
+  const se = (id, txt) => { const el=document.getElementById(id); if(el)el.textContent=txt; };
+  const si = (id, html) => { const el=document.getElementById(id); if(el)el.innerHTML=html; };
+  const sp = (id, txt) => { const el=document.getElementById(id); if(el)el.placeholder=txt; };
+
+  si('ttlSub', d.subtl);
+  se('joinTitle', d.joinTitle);
+  se('lblName', d.lblName);
+  se('lblCountry', d.lblCountry);
+  se('divOrText', d.divOr);
+  sp('nickIn', d.nickPh);
+  sp('ctText', d.ctPh);
+  document.getElementById('btnJoin').textContent = d.btnJoin;
+  document.getElementById('startBtn').textContent = d.btnStart;
+  const sp0 = document.getElementById('selPlaceholder');
+  if(sp0) sp0.textContent = d.selPh;
+  const msp = document.getElementById('midSelPlaceholder');
+  if(msp) msp.textContent = d.selPh;
+  se('cheerTitle', d.cheerTitle);
+  se('midTitle', d.midTitle);
+  se('midLblName', d.midLblName);
+  se('midLblCountry', d.midLblCountry);
+  sp('midNick', d.midNickPh);
+  const mjb = document.getElementById('midJoinBtn');
+  if(mjb) mjb.textContent = d.midJoinBtn;
+  const mtb = document.getElementById('midToggleBtn');
+  if(mtb) mtb.textContent = d.midToggle;
+  const hb = document.getElementById('hintBtn');
+  if(hb) hb.textContent = hints ? d.hintOff : d.hint;
+  const sb2 = document.getElementById('sndBtn');
+  if(sb2) sb2.textContent = sndOn ? d.sndOn : d.sndOff;
+  const rb = document.getElementById('resetBtn');
+  if(rb) rb.textContent = d.resetBtn;
+  const pab = document.getElementById('playAgainBtn');
+  if(pab) pab.textContent = d.playAgain;
+  se('popCellsLbl', d.popCells);
+  const pjb = document.getElementById('popJoinBtn');
+  if(pjb) pjb.textContent = d.popJoin;
+  const pcb = document.getElementById('popCloseBtn');
+  if(pcb) pcb.textContent = d.popClose;
+  se('etapTxt', d.tapClose);
+}
+
+// 国選択時の言語切り替え
+function onCountrySelect(code) {
+  if (!code) return;
+  const lang = COUNTRY_LANG[code] || 'en';
+  currentLang = lang;
+  applyLang();
+}
+
+// =============================================
 // 地図データ
+// =============================================
 const COLS=44,ROWS=26;
 const MAPD=["00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00111000000111000001111100000000000000000000","01111100011111111111111111000000000000000000","01111111111111111111111111100000000000000000","00111111111111111111111111110000000010000000","00011111111111111111111111110000000011000000","00001111111111011111111111000000000001100000","00000111111100001111111100000000001100001100","00000011111000000111111000000000001111001000","00000011110000000011110000000001001111000000","00000011100000000011111000000000000111000000","00000011100000000011101000000000000111000000","00000011100000000011101000000000000001000000","00000001000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00000000000000000000000000011000000000000000","00000000000000000000000000011100000000000000","00000000000000000000000000001100000000000000","00000000000000000000000000000000000000100000","00000000000000000000000000000000000000100000","00000000000000000000000000000000000000100000","00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000","00000000000000000000000000000000000000000000"];
 const ISL=[[8,40],[9,40],[8,41],[7,6],[8,6],[8,7],[3,15],[4,15],[4,16],[3,16],[2,12],[2,13],[6,18],[7,18],[11,22],[12,22],[13,22],[5,36],[6,36],[6,37],[7,37],[7,38],[8,34],[9,34],[10,34],[10,35],[11,35],[11,36],[12,35],[10,31],[20,38],[21,38],[22,38],[7,7],[8,8],[3,14]];
@@ -208,7 +1285,9 @@ ISL.forEach(([r,c])=>{if(r<ROWS&&c<COLS)GR[r][c]=1;});
 const LTOTAL=GR.flat().filter(v=>v===1).length;
 const DIR=[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
 
-// 国データ
+// =============================================
+// 国データ（全リスト保持）
+// =============================================
 const NS=[
   {c:'jp',n:'日本',k:['日本','にほん','japan','jp']},
   {c:'us',n:'アメリカ',k:['アメリカ','あめりか','usa','us','america']},
@@ -295,39 +1374,32 @@ const PAL=[
 ];
 
 function fUrl(c){return`https://flagcdn.com/w40/${c}.png`;}
-
-// ひらがな→カタカナ
 function h2k(s){return s.replace(/[\u3041-\u3096]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));}
-
-// 国検索
 function findN(q){
-  q=q.trim().replace(/\s/g,'');
-  if(!q)return null;
-  const ql=q.toLowerCase();
-  const qk=h2k(q).toLowerCase();
-  return NS.find(x=>x.k.some(k=>{
-    const kl=k.toLowerCase();
-    return kl===ql||kl===qk||h2k(k).toLowerCase()===ql;
-  }))||null;
+  q=q.trim().replace(/\s/g,'');if(!q)return null;
+  const ql=q.toLowerCase();const qk=h2k(q).toLowerCase();
+  return NS.find(x=>x.k.some(k=>{const kl=k.toLowerCase();return kl===ql||kl===qk||h2k(k).toLowerCase()===ql;}))||null;
 }
 function findC(c){return NS.find(x=>x.c===c)||null;}
 
-// selectを構築（DOMContentLoaded後に実行保証）
+// コンボボックス構築（自国語名で表示）
 function buildSelects(){
-  const sorted=[...NS].sort((a,b)=>a.n.localeCompare(b.n,'ja'));
+  const sorted=[...NS].sort((a,b)=>{
+    const na=NATIVE_NAMES[a.c]||a.n;
+    const nb=NATIVE_NAMES[b.c]||b.n;
+    return na.localeCompare(nb);
+  });
   ['ctSelect','midSel'].forEach(id=>{
     const sel=document.getElementById(id);
     if(!sel)return;
-    // 既存のoption（最初の1つ）を保持して追加
     while(sel.options.length>1)sel.remove(1);
     sorted.forEach(x=>{
-      const o=new Option(x.n,x.c);
+      const native=NATIVE_NAMES[x.c]||x.n;
+      const o=new Option(`${native} (${x.n})`,x.c);
       sel.add(o);
     });
   });
 }
-
-// DOMが確実に準備できてから実行
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',buildSelects);
 } else {
@@ -339,12 +1411,9 @@ const IP={},IR={};
 function loadImg(c){
   if(!IP[c]){
     IP[c]=new Promise(res=>{
-      const i=new Image();
-      i.crossOrigin='anonymous';
-      i.onload=()=>{IR[c]=i;res(i);};
-      i.onerror=()=>res(null);
-      i.src=fUrl(c);
-      setTimeout(()=>res(null),6000);
+      const i=new Image();i.crossOrigin='anonymous';
+      i.onload=()=>{IR[c]=i;res(i);};i.onerror=()=>res(null);
+      i.src=fUrl(c);setTimeout(()=>res(null),6000);
     });
   }
   return IP[c];
@@ -364,19 +1433,22 @@ function doAdd(){
   const selCode=sel.value;
   const txt=document.getElementById('ctText').value.trim();
   const err=document.getElementById('errMsg');
-  if(!nick){err.textContent='① Enter name / 名前を入力してください！';return;}
+  if(!nick){err.textContent=T('errNeedName');return;}
   let nation=selCode?findC(selCode):txt?findN(txt):null;
-  if(!nation){err.textContent='② Select or type country below / 国を選択または入力してください';return;}
-  if(players.length>=8&&!players.find(p=>p.id===nation.c)){err.textContent='Max 8 countries / 最大8カ国';return;}
+  if(!nation){err.textContent=T('errNeedCountry');return;}
+  if(players.length>=8&&!players.find(p=>p.id===nation.c)){err.textContent=T('errMax');return;}
   err.textContent='';
   const ex=players.find(p=>p.id===nation.c);
   if(ex){ex.nicks.push(nick);}
   else{players.push({id:nation.c,code:nation.c,name:nation.n,nicks:[nick],col:PAL[players.length%8]});}
-  document.getElementById('nickIn').value='';
-  sel.value='';
+  document.getElementById('nickIn').value='';sel.value='';
   document.getElementById('ctText').value='';
   document.getElementById('startBtn').disabled=(players.length<2);
-  loadImg(nation.c).then(i=>{if(i)IR[nation.c]=i;renderChips();showEntry(nation.c,nick,nation.n,ex?'joined the team! / チームに加わった！':' joined the battle! / が参戦！');});
+  loadImg(nation.c).then(i=>{
+    if(i)IR[nation.c]=i;renderChips();
+    const msg=ex?T('joinedTeam',nation.n):T('joinedMsg',nation.n);
+    showEntry(nation.c,nick,nation.n,msg);
+  });
   renderChips();
 }
 function removeP(id){
@@ -394,8 +1466,6 @@ function renderChips(){
       <span style="cursor:pointer;color:#888;margin-left:3px;font-size:15px;line-height:1;" onclick="removeP('${p.id}')">×</span>
     </div>`).join('');
 }
-
-// Enterキー対応
 document.getElementById('nickIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('ctSelect').focus();}});
 document.getElementById('ctText').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doAdd();}});
 
@@ -404,8 +1474,8 @@ let entTO=null;
 function showEntry(code,nick,cn,msg){
   const i=gImg(code);
   document.getElementById('entryImg').src=i?i.src:fUrl(code);
-  document.getElementById('entryName').textContent=nick+'  joined the battle! / が参戦！';
-  document.getElementById('entrySub').textContent=cn+' '+msg;
+  document.getElementById('entryName').textContent=T('joined',nick);
+  document.getElementById('entrySub').textContent=msg;
   document.getElementById('entryOv').classList.add('show');
   playSnd('entry');
   if(entTO)clearTimeout(entTO);
@@ -434,7 +1504,11 @@ function playSnd(type,pi=0,fi=0,tot=1){
     else if(type==='cheer'){note(880,t,0.12,0.25);note(1100,t+0.08,0.1,0.2);}
   }catch(e){}
 }
-function toggleSnd(){sndOn=!sndOn;document.getElementById('sndBtn').innerHTML=sndOn?'🔊 Sound ON<br><span style="font-size:0.7em;">音あり</span>':'🔇 Sound OFF<br><span style="font-size:0.7em;">音なし</span>';}
+function toggleSnd(){
+  sndOn=!sndOn;
+  const b=document.getElementById('sndBtn');
+  if(b)b.textContent=sndOn?T('sndOn'):T('sndOff');
+}
 
 // ゲーム変数
 let board=null,turnIdx=0,hints=false,gameOver=false,animating=false;
@@ -445,14 +1519,21 @@ const RESET_MS=5*60*1000;
 function isL(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS&&GR[r][c]===1;}
 function isCo(r,c){return DIR.some(([dr,dc])=>{const nr=r+dr,nc=c+dc;return nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&GR[nr][nc]===0;});}
 function getFlips(r,c,id){
-  if(!isL(r,c)||board[r][c])return[];
-  const fl=[];
+  if(!isL(r,c)||board[r][c])return[];const fl=[];
   for(const[dr,dc]of DIR){let tr=r+dr,tc=c+dc,ln=[];while(isL(tr,tc)){const t=board[tr][tc];if(!t)break;if(t===id){if(ln.length)fl.push(...ln);break;}ln.push([tr,tc]);tr+=dr;tc+=dc;}}
   return fl;
 }
 function isSetup(){return turnIdx<gPs.length;}
 function curTeam(){return gPs[turnIdx%gPs.length];}
 function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+
+// ターンに合わせて言語切り替え
+function switchLangForTurn(){
+  const cur=curTeam();if(!cur)return;
+  const lang=COUNTRY_LANG[cur.code]||'en';
+  currentLang=lang;
+  applyLang();
+}
 
 function startSkip(){
   stopSkip();skipSec=60;updSkipUI();
@@ -466,24 +1547,39 @@ function updSkipUI(){
   f.style.background=skipSec>30?'#44cc44':skipSec>10?'#ff9900':'#ff4444';
   const cur=curTeam();if(!cur)return;
   const col=skipSec>30?'#44cc44':skipSec>10?'#ff9900':'#ff4444';
-  info.innerHTML=`⏱ <b style="color:${col};">${skipSec}sec</b> remaining for <b>${cur.name}</b>（${cur.nicks.join('・')}) to place or skip<br><span style="font-size:0.85em;">）が置かなければスキップ</span>`;
+  const who=cur.nicks.join('・');
+  info.innerHTML=`<span style="color:${col};">⏱ ${T('secRemain',skipSec,cur.name,who)}</span>`;
 }
-function doSkip(){const cur=curTeam();setLive(`⏩ ${cur?cur.name:''} timed out! Next team / タイムアウト！次のチームへ`);turnIdx++;updBanner();updBorder();startSkip();lastMove=Date.now();}
+function doSkip(){
+  const cur=curTeam();
+  setLive(T('timeout',cur?cur.name:''));
+  turnIdx++;switchLangForTurn();updBanner();updBorder();startSkip();lastMove=Date.now();
+}
 function startGlobal(){
   lastMove=Date.now();if(gTmr)clearInterval(gTmr);
   gTmr=setInterval(()=>{if(gameOver){clearInterval(gTmr);return;}if(Date.now()-lastMove>RESET_MS){clearInterval(gTmr);autoReset();}},5000);
 }
 function autoReset(){
-  setLive('⏰ 5 min no action — Auto Reset! / 自動リセット！');
-  setTimeout(()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(null));turnIdx=0;gameOver=false;animating=false;initCheer();drawMap();updSB();updBanner();updBorder();renderCheer();setLive('🔄 Reset<br><span style="font-size:0.7em;">リセット</span>！新たな戦いが始まる！');startGlobal();startSkip();},2000);
+  setLive(T('autoReset'));
+  setTimeout(()=>{
+    board=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+    turnIdx=0;gameOver=false;animating=false;
+    initCheer();drawMap();updSB();updBanner();updBorder();renderCheer();
+    setLive(T('resetDone'));startGlobal();startSkip();
+  },2000);
 }
 
 function initCheer(){cheerData={};gPs.forEach(p=>{cheerData[p.id]=20+Math.floor(Math.random()*25);});}
-function addCheer(id){cheerData[id]=Math.min(100,(cheerData[id]||0)+10);renderCheer();playSnd('cheer');const p=gPs.find(x=>x.id===id);if(p)setLive(`🎉 ${p.name}'s cheer gauge up! / への応援ゲージ上昇！`);}
+function addCheer(id){
+  cheerData[id]=Math.min(100,(cheerData[id]||0)+10);
+  renderCheer();playSnd('cheer');
+  const p=gPs.find(x=>x.id===id);
+  if(p)setLive(T('cheerUp',p.name));
+}
 function renderCheer(){
   if(!gPs.length)return;
   document.getElementById('cheerEl').innerHTML=gPs.map(p=>{
-    const ns=p.nicks.slice(0,2).join('・')+(p.nicks.length>2?` +${p.nicks.length-2}人`:'');
+    const ns=p.nicks.slice(0,2).join('・')+(p.nicks.length>2?` +${p.nicks.length-2}`:'');
     return`<div class="crow">${fTag(p.code,18,12)}<div class="cname">${p.name}<br><span style="font-size:8px;color:#888;">${ns}</span></div><div class="cbg"><div class="cbar" style="width:${cheerData[p.id]||0}%;background:${p.col.bg};"></div></div><div class="cpct">${cheerData[p.id]||0}%</div><button class="cbtn" onclick="addCheer('${p.id}')">📣</button></div>`;
   }).join('');
 }
@@ -509,15 +1605,15 @@ function updSB(){
   const sc=getScores();const cur=gameOver?null:curTeam();
   document.getElementById('sb').innerHTML=gPs.map(p=>{
     const on=cur&&p.id===cur.id;
-    const ns=p.nicks.slice(0,2).join('・')+(p.nicks.length>2?` +${p.nicks.length-2}人`:'');
-    return`<div class="scard ${on?'on':''}" style="background:${p.col.bg}22;border-color:${on?p.col.bg:'#2a3a5e'};" onclick="showPop('${p.id}')">${fTag(p.code,32,21)}<div class="ss" style="color:${p.col.bg};">${sc[p.id]}</div><div class="sn">${p.name}</div><div class="sk" style="color:${on?p.col.bg:'#777'};">${on?'▶ Now playing / 今の番':ns}</div></div>`;
+    const ns=p.nicks.slice(0,2).join('・')+(p.nicks.length>2?` +${p.nicks.length-2}`:'');
+    return`<div class="scard ${on?'on':''}" style="background:${p.col.bg}22;border-color:${on?p.col.bg:'#2a3a5e'};" onclick="showPop('${p.id}')">${fTag(p.code,32,21)}<div class="ss" style="color:${p.col.bg};">${sc[p.id]}</div><div class="sn">${p.name}</div><div class="sk" style="color:${on?p.col.bg:'#777'};">${on?T('nowTurn'):ns}</div></div>`;
   }).join('');
 }
 function updBanner(){
   if(gameOver)return;const cur=curTeam();if(!cur)return;
-  const who=cur.nicks.slice(0,3).join('・')+(cur.nicks.length>3?` +他${cur.nicks.length-3}人`:'');
+  const who=cur.nicks.slice(0,3).join('・')+(cur.nicks.length>3?` +${cur.nicks.length-3}`:'');
   const b=document.getElementById('tbanner');
-  b.innerHTML=`${fTag(cur.code,28,19)}<div class="tt"><b style="color:${cur.col.bg};font-size:14px;">${cur.name}</b>（${who}）'s turn! Anyone can play<br><span style="font-size:0.8em;">の番！誰でも置けます</span>${isSetup()?' — Place your first piece / 初期配置':''}</div>`;
+  b.innerHTML=`${fTag(cur.code,28,19)}<div class="tt"><b style="color:${cur.col.bg};font-size:14px;">${cur.name}</b> ${T('turnMsg',cur.name,who,isSetup())}</div>`;
   b.style.background=cur.col.bg+'22';b.style.borderColor=cur.col.bg;
 }
 function updBorder(){
@@ -533,10 +1629,13 @@ function showPop(id){
   const sc=getScores();const img=gImg(p.code);
   document.getElementById('popImg').src=img?img.src:fUrl(p.code);
   document.getElementById('popTtl').textContent=p.name;
-  document.getElementById('popCnt').textContent=p.nicks.length+' players in / 人参戦中';
-  document.getElementById('popScore').textContent=sc[id]+'cells / マス';
+  document.getElementById('popCnt').textContent=p.nicks.length+' '+T('popCells');
+  document.getElementById('popScore').textContent=sc[id];
+  document.getElementById('popCellsLbl').textContent=T('popCells');
+  document.getElementById('popJoinBtn').textContent=T('popJoin');
+  document.getElementById('popCloseBtn').textContent=T('popClose');
   const cur=curTeam();
-  document.getElementById('popMembers').innerHTML=p.nicks.map((n,i)=>`<div class="mitem"><div class="mnum">${i+1}</div><div class="mname">${n}</div>${cur&&cur.id===id&&i===0?'<div class="mbadge">▶ Now / 番</div>':''}</div>`).join('');
+  document.getElementById('popMembers').innerHTML=p.nicks.map((n,i)=>`<div class="mitem"><div class="mnum">${i+1}</div><div class="mname">${n}</div>${cur&&cur.id===id&&i===0?`<div class="mbadge">${T('nowTurn')}</div>`:''}</div>`).join('');
   document.getElementById('popOv').classList.add('show');
 }
 function closePop(){document.getElementById('popOv').classList.remove('show');popCode=null;}
@@ -549,22 +1648,34 @@ function handleTap(clientX,clientY){
   const c=Math.floor((clientX-rect.left)*(cv.width/rect.width)/CW);
   const r=Math.floor((clientY-rect.top)*(cv.height/rect.height)/CH);
   if(r<0||r>=ROWS||c<0||c>=COLS)return;
-  if(!isL(r,c)){setLive('🌊 Cannot place on sea! / 海には置けません！');return;}
-  if(board[r][c]){setLive('⛔ Already occupied! / すでに占領済み！');return;}
+  if(!isL(r,c)){setLive(T('noSea'));return;}
+  if(board[r][c]){setLive(T('occupied'));return;}
   const cur=curTeam();const pi=gPs.indexOf(cur);const nick=rnd(cur.nicks);
   lastMove=Date.now();stopSkip();
   try{const ac=gAC();if(ac&&ac.state==='suspended')ac.resume();}catch(e){}
   if(isSetup()){
     board[r][c]=cur.id;playSnd('place',pi);turnIdx++;
     drawMap();updSB();updBanner();updBorder();
-    setLive(`🏳️ ${nick} planted the ${cur.name} flag!${turnIdx>=gPs.length?' / Let us go!':''}`)
+    switchLangForTurn();
+    setLive(T('plantFlag',nick,cur.name)+(turnIdx>=gPs.length?' '+T('letsGo'):''));
+    startSkip();return;
   }
   const flips=getFlips(r,c,cur.id);board[r][c]=cur.id;playSnd('place',pi);drawMap();
-  if(!flips.length){turnIdx++;updSB();updBanner();updBorder();setLive(`${nick} holds the line... /  holds the line / が陣地を固める…`);startSkip();checkFull();return;}
+  if(!flips.length){
+    turnIdx++;updSB();updBanner();updBorder();
+    switchLangForTurn();
+    setLive(T('holdsLine',nick));startSkip();checkFull();return;
+  }
   const tot=flips.length;const iv=Math.max(55,100-tot*3);animating=true;
-  setLive(tot>=5?rnd([`⚡ ${nick}が${tot}マス massive capture!! / 大量奪取！！`,`🔥 ${nick}'s fierce attack! / の猛攻！${tot} cells seized! /  cells seized! / マス制圧！`]):tot>=3?rnd([`🎯 ${nick}が${tot} cells captured! / マス奪取！`]):`${nick}が${tot} cells taken! / マスを奪った！`);
+  const liveMsg=tot>=5?rnd([T('bigCapture',nick,tot),T('attack',nick,tot)]):tot>=3?T('capture3',nick,tot):T('capture1',nick,tot);
+  setLive(liveMsg);
   flips.forEach(([fr,fc],i)=>{setTimeout(()=>{playSnd('flip',pi,i,tot);board[fr][fc]=cur.id;drawMap();updSB();},i*iv);});
-  setTimeout(()=>{animating=false;turnIdx++;updSB();updBanner();updBorder();startSkip();checkFull();},tot*iv+250);
+  setTimeout(()=>{
+    animating=false;turnIdx++;
+    updSB();updBanner();updBorder();
+    switchLangForTurn();
+    startSkip();checkFull();
+  },tot*iv+250);
 }
 
 const gcEl=document.getElementById('gc');
@@ -579,36 +1690,45 @@ function showResult(){
   document.getElementById('gameSec').style.display='none';document.getElementById('resultSec').style.display='block';
   const sc=getScores();const rk=[...gPs].map(p=>({...p,score:sc[p.id]})).sort((a,b)=>b.score-a.score);
   const mx=rk[0].score;const mvp=rk[0];const mvpN=rnd(mvp.nicks);
-  const md=['🥇','🥈','🥉','4位','5位','6位','7位','8位'];
-  window._sT=`🏰 FLAG KINGDOMで${mvpN}（${mvp.name}）が優勝！${mvp.score} cells conquered! / マス制覇！ #FlagKingdom`;
+  const md=['🥇','🥈','🥉','4','5','6','7','8'];
+  window._sT=T('shareText',mvpN,mvp.name,mvp.score);
   document.getElementById('resultEl').innerHTML=`
-    <div style="font-size:18px;font-weight:900;text-align:center;margin-bottom:8px;color:#f5a623;">🏆 GAME OVER! / ゲーム終了！</div>
-    <div class="mvpband"><div class="ml">👑 MVP</div><div class="mn">${mvpN}</div><div class="ms">${mvp.name} · ${mvp.score} cells conquered! / マス制覇！</div></div>
-    ${rk.map((p,i)=>`<div class="rrow" style="background:${p.col.bg}22;border:1.5px solid ${p.col.bo};"><div class="rnum">${md[i]}</div>${fTag(p.code,30,20)}<div class="rname" style="color:#eee;">${p.name}<br><span style="font-size:9px;color:#888;">${p.nicks.join('・')}</span></div><div class="rbg"><div class="rbar" style="width:${Math.round(p.score/mx*100)}%;background:${p.col.bg};"></div></div><div class="rscore" style="color:${p.col.bg};">${p.score}マス</div></div>`).join('')}
+    <div style="font-size:18px;font-weight:900;text-align:center;margin-bottom:8px;color:#f5a623;">${T('gameOver')}</div>
+    <div class="mvpband"><div class="ml">${T('mvpLabel')}</div><div class="mn">${mvpN}</div><div class="ms">${T('mvpSub',mvp.name,mvp.score)}</div></div>
+    ${rk.map((p,i)=>`<div class="rrow" style="background:${p.col.bg}22;border:1.5px solid ${p.col.bo};"><div class="rnum">${md[i]||i+1}</div>${fTag(p.code,30,20)}<div class="rname" style="color:#eee;">${p.name}<br><span style="font-size:9px;color:#888;">${p.nicks.join('・')}</span></div><div class="rbg"><div class="rbar" style="width:${Math.round(p.score/mx*100)}%;background:${p.col.bg};"></div></div><div class="rscore" style="color:${p.col.bg};">${p.score}</div></div>`).join('')}
     <div class="sharerow">
-      <button class="sharex" onclick="window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(window._sT),'_blank')">𝕏 Share on X / Xでシェア</button>
-      <button class="sharec" onclick="doCopy()">📋 Copy / コピー</button>
+      <button class="sharex" onclick="window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(window._sT),'_blank')">${T('shareX')}</button>
+      <button class="sharec" onclick="doCopy()">${T('shareCopy')}</button>
     </div>
     <div style="margin-top:12px;padding:12px;background:rgba(245,166,35,0.1);border:1.5px solid #f5a623;border-radius:10px;text-align:center;">
-      <div style="font-size:12px;color:#f5a623;font-weight:700;margin-bottom:8px;">☕ このゲームが楽しかったら作者を応援してください！</div>
+      <div style="font-size:12px;color:#f5a623;font-weight:700;margin-bottom:8px;">${T('supportMsg')}</div>
       <div style="display:flex;gap:8px;">
-        <button onclick="window.open('https://ofuse.me/YOUR_ID','_blank')" style="flex:1;padding:10px;border:none;border-radius:8px;background:#1DA1F2;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🎁 Ofuseで投げ銭</button>
+        <button onclick="window.open('https://ofuse.me/YOUR_ID','_blank')" style="flex:1;padding:10px;border:none;border-radius:8px;background:#1DA1F2;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🎁 Ofuse</button>
         <button onclick="window.open('https://www.buymeacoffee.com/YOUR_ID','_blank')" style="flex:1;padding:10px;border:none;border-radius:8px;background:#FFDD00;color:#000;font-size:13px;font-weight:700;cursor:pointer;">☕ Buy Me a Coffee</button>
       </div>
     </div>`;
 }
-function doCopy(){if(navigator.clipboard){navigator.clipboard.writeText(window._sT||'').then(()=>alert('コピーしました！')).catch(()=>alert(window._sT||''));}else{alert(window._sT||'');}}
+function doCopy(){
+  if(navigator.clipboard){navigator.clipboard.writeText(window._sT||'').then(()=>alert(T('copied'))).catch(()=>alert(window._sT||''));}
+  else{alert(window._sT||'');}
+}
 
 async function startGame(){
-  if(players.length<2){document.getElementById('errMsg').textContent='2 or more countries needed / 2カ国以上必要';return;}
+  if(players.length<2){document.getElementById('errMsg').textContent=T('errMin');return;}
   gPs=[...players];
   const btn=document.getElementById('startBtn');
-  btn.textContent='🏳️ Loading flags... / 国旗を読み込み中…';btn.disabled=true;
+  btn.textContent=T('loadingFlags');btn.disabled=true;
   try{const ac=gAC();if(ac&&ac.state==='suspended')await ac.resume();}catch(e){}
   await preloadAll(gPs.map(p=>p.code));
-  btn.innerHTML='🚀 GAME START！🏰<br><span style="font-size:0.75em;">ゲームスタート！</span>';btn.disabled=false;
+  btn.textContent=T('btnStart');btn.disabled=false;
   board=Array.from({length:ROWS},()=>Array(COLS).fill(null));
   turnIdx=0;hints=false;gameOver=false;animating=false;initCheer();
+  // 最初のチームの言語に切り替え
+  const firstTeam=gPs[0];
+  if(firstTeam){
+    currentLang=COUNTRY_LANG[firstTeam.code]||'en';
+    applyLang();
+  }
   document.getElementById('joinSec').style.display='none';
   document.getElementById('resultSec').style.display='none';
   document.getElementById('gameSec').style.display='block';
@@ -620,7 +1740,7 @@ async function startGame(){
     CH=Math.max(9,Math.floor(CW*0.78));
     cv.width=COLS*CW;cv.height=ROWS*CH;
     updLegend();updSB();updBanner();updBorder();renderCheer();drawMap();
-    setLive('⚔️ FLAG KINGDOM begins! Make your first move! / 最初の一手を！');
+    setLive(T('gameBegin'));
     startGlobal();startSkip();
   },200);
 }
@@ -630,24 +1750,28 @@ function doMidJoin(){
   const nick=document.getElementById('midNick').value.trim();
   const code=document.getElementById('midSel').value;
   const err=document.getElementById('midErr');
-  if(!nick){err.textContent='Enter your name / 名前を入力してください';return;}
-  if(!code){err.textContent='Please select a country / 国を選んでください';return;}
+  if(!nick){err.textContent=T('errNeedNameMid');return;}
+  if(!code){err.textContent=T('errNeedCountryMid');return;}
   err.textContent='';
   const nation=findC(code);if(!nation)return;
   const ex=gPs.find(p=>p.id===code);
   if(ex){ex.nicks.push(nick);}
-  else{if(gPs.length>=8){err.textContent='Max 8 countries / 最大8カ国まで';return;}const np={id:code,code,name:nation.n,nicks:[nick],col:PAL[gPs.length%8]};gPs.push(np);players.push(np);cheerData[code]=25;}
-  document.getElementById('midNick').value='';
-  document.getElementById('midSel').value='';
+  else{if(gPs.length>=8){err.textContent=T('errMaxMid');return;}const np={id:code,code,name:nation.n,nicks:[nick],col:PAL[gPs.length%8]};gPs.push(np);players.push(np);cheerData[code]=25;}
+  document.getElementById('midNick').value='';document.getElementById('midSel').value='';
   document.getElementById('midSec').style.display='none';
-  loadImg(code).then(i=>{if(i)IR[code]=i;drawMap();updSB();updLegend();renderCheer();showEntry(code,nick,nation.n,ex?'joined the team mid-game! / チームに途中参戦！':' joined as new country! / 新国として参戦！');});
-  updLegend();updSB();renderCheer();setLive(`🔥 ${nick}が${nation.n} joined mid-game! / で途中参戦！`);
+  loadImg(code).then(i=>{
+    if(i)IR[code]=i;drawMap();updSB();updLegend();renderCheer();
+    const msg=ex?T('joinedTeam',nation.n):T('joinedMsg',nation.n);
+    showEntry(code,nick,nation.n,msg);
+  });
+  updLegend();updSB();renderCheer();setLive(T('midJoined',nick,nation.n));
 }
 
-function confirmReset(){if(confirm('Reset? / リセットしますか？'))doReset();}
+function confirmReset(){if(confirm(T('resetConfirm')))doReset();}
 function doReset(){
   stopSkip();if(gTmr)clearInterval(gTmr);
   players=[];gPs=[];board=null;turnIdx=0;gameOver=false;animating=false;
+  currentLang='en';applyLang();
   document.getElementById('chips').innerHTML='';
   document.getElementById('startBtn').disabled=true;
   document.getElementById('errMsg').textContent='';
@@ -656,9 +1780,17 @@ function doReset(){
   document.getElementById('resultSec').style.display='none';
   document.getElementById('joinSec').style.display='block';
 }
-function toggleHint(){hints=!hints;document.getElementById('hintBtn').innerHTML=hints?'💡 Hint<br><span style="font-size:0.7em;">ヒント</span>OFF':'💡 Hint<br><span style="font-size:0.7em;">ヒント</span>';drawMap();}
+function toggleHint(){
+  hints=!hints;
+  const b=document.getElementById('hintBtn');
+  if(b)b.textContent=hints?T('hintOff'):T('hint');
+  drawMap();
+}
 let rszT=null;
 window.addEventListener('resize',()=>{if(!cv||!board)return;clearTimeout(rszT);rszT=setTimeout(()=>{const w=document.getElementById('mapwrap');const ww=Math.max(200,w.getBoundingClientRect().width||300);CW=Math.max(12,Math.floor((ww-8)/COLS));CH=Math.max(9,Math.floor(CW*0.78));cv.width=COLS*CW;cv.height=ROWS*CH;drawMap();},300);});
+
+// 初期UI適用
+applyLang();
 </script>
 </body>
 </html>
